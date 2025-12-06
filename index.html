@@ -32,12 +32,77 @@
             flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .header h1 {
             color: #667eea;
             font-size: 24px;
             text-align: center;
+        }
+
+        .hamburger-menu {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .hamburger-btn {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+
+        .hamburger-btn:hover {
+            color: #764ba2;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 10px;
+            min-width: 180px;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+
+        .dropdown-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
         }
 
         .month-nav {
@@ -441,6 +506,17 @@
 <body>
     <div class="container">
         <div class="header">
+            <div class="hamburger-menu">
+                <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item active" id="personalItem" onclick="switchToPersonal()">
+                        👤 Personal Mode
+                    </div>
+                    <div class="dropdown-item" id="sharedItem" onclick="switchToShared()">
+                        👥 Shared Mode
+                    </div>
+                </div>
+            </div>
             <h1>Expense Tracker</h1>
             <div class="month-nav">
                 <button onclick="prevMonth()">←</button>
@@ -558,15 +634,55 @@
         </div>
     </div>
 
+    <!-- Shared Mode Modal -->
+    <div class="modal" id="sharedModal">
+        <div class="modal-content">
+            <div class="modal-title">Shared Tracker</div>
+            <p style="color: #666; margin-bottom: 15px;">Enter a shared code to collaborate with others. Anyone with this code can view and edit the tracker.</p>
+            <div class="form-group">
+                <label>Shared Code</label>
+                <input type="text" id="sharedCodeInput" placeholder="e.g., family2024">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeSharedModal()">Cancel</button>
+                <button class="btn-primary" onclick="activateSharedMode()">Connect</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentDate = new Date();
         let data = {
-            incomes: [], // Global incomes
-            months: {},  // Month-specific expenses
-            piggyBank: 0 // Total saved in piggy bank
+            incomes: [],
+            months: {},
+            piggyBank: 0
         };
         let currentExpenseId = null;
         let editingIncomeIdx = null;
+        let isSharedMode = false;
+        let sharedCode = '';
+
+        // Storage functions
+        async function saveData() {
+            try {
+                const storageKey = isSharedMode ? `tracker-${sharedCode}` : 'tracker-personal';
+                await window.storage.set(storageKey, JSON.stringify(data), isSharedMode);
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        async function loadData() {
+            try {
+                const storageKey = isSharedMode ? `tracker-${sharedCode}` : 'tracker-personal';
+                const result = await window.storage.get(storageKey, isSharedMode);
+                if (result && result.value) {
+                    data = JSON.parse(result.value);
+                }
+            } catch (error) {
+                console.log('No existing data found or error loading:', error);
+            }
+        }
 
         function getMonthKey() {
             return `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
@@ -580,6 +696,56 @@
                     addedToPiggyBank: false
                 };
             }
+        }
+
+        async function switchToPersonal() {
+            isSharedMode = false;
+            sharedCode = '';
+            document.getElementById('personalItem').classList.add('active');
+            document.getElementById('sharedItem').classList.remove('active');
+            document.getElementById('dropdownMenu').classList.remove('show');
+            await loadData();
+            updateDisplay();
+        }
+
+        function switchToShared() {
+            document.getElementById('dropdownMenu').classList.remove('show');
+            document.getElementById('sharedModal').classList.add('show');
+        }
+
+        function toggleMenu() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('dropdownMenu');
+            const hamburger = document.querySelector('.hamburger-btn');
+            if (menu && !menu.contains(event.target) && event.target !== hamburger) {
+                menu.classList.remove('show');
+            }
+        });
+
+        function closeSharedModal() {
+            document.getElementById('sharedModal').classList.remove('show');
+        }
+
+        async function activateSharedMode() {
+            const code = document.getElementById('sharedCodeInput').value.trim();
+            if (!code) {
+                alert('Please enter a shared code');
+                return;
+            }
+            
+            isSharedMode = true;
+            sharedCode = code;
+            document.getElementById('personalItem').classList.remove('active');
+            document.getElementById('sharedItem').classList.add('active');
+            closeSharedModal();
+            
+            await loadData();
+            updateDisplay();
+            alert(`Connected to shared tracker: ${code}\n\nAnyone with this code can access and edit this tracker!`);
         }
 
         function addToPiggyBank() {
@@ -599,8 +765,9 @@
             if (saved > 0) {
                 data.piggyBank += saved;
                 monthData.addedToPiggyBank = true;
+                saveData();
                 updateDisplay();
-                alert(`${saved.toFixed(2)} added to Piggy Bank!`);
+                alert(`$${saved.toFixed(2)} added to Piggy Bank!`);
             } else {
                 alert('No savings to add this month.');
             }
@@ -621,6 +788,7 @@
             if (!isNaN(amount) && amount >= 0) {
                 data.piggyBank = amount;
                 closePiggyBankModal();
+                saveData();
                 updateDisplay();
             }
         }
@@ -634,19 +802,17 @@
             initMonth();
             const monthData = data.months[getMonthKey()];
             
-            // Calculate totals
             const totalIncome = data.incomes.reduce((sum, inc) => sum + inc.amount, 0);
             const totalSpent = monthData.expenses.reduce((sum, exp) => {
                 return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
             }, 0);
             const saved = totalIncome - totalSpent;
 
-            document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)}`;
-            document.getElementById('totalSpent').textContent = `${totalSpent.toFixed(2)}`;
-            document.getElementById('totalSaved').textContent = `${saved.toFixed(2)}`;
-            document.getElementById('piggyBank').textContent = `${data.piggyBank.toFixed(2)}`;
+            document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('totalSpent').textContent = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('totalSaved').textContent = `$${saved.toFixed(2)}`;
+            document.getElementById('piggyBank').textContent = `$${data.piggyBank.toFixed(2)}`;
 
-            // Render income list
             const incomeList = document.getElementById('incomeList');
             incomeList.innerHTML = data.incomes.map((inc, idx) => `
                 <div class="income-item">
@@ -660,7 +826,6 @@
                 </div>
             `).join('');
 
-            // Render expense list
             const expenseList = document.getElementById('expenseList');
             expenseList.innerHTML = monthData.expenses.map((exp, idx) => {
                 const total = exp.subitems.reduce((s, sub) => s + sub.amount, 0);
@@ -730,13 +895,12 @@
             
             if (name && amount > 0) {
                 if (editingIncomeIdx !== null) {
-                    // Edit existing income
                     data.incomes[editingIncomeIdx] = { name, amount };
                 } else {
-                    // Add new income
                     data.incomes.push({ name, amount });
                 }
                 closeIncomeModal();
+                saveData();
                 updateDisplay();
             }
         }
@@ -757,6 +921,7 @@
                 const monthData = data.months[getMonthKey()];
                 monthData.expenses.push({ name, subitems: [] });
                 closeExpenseModal();
+                saveData();
                 updateDisplay();
             }
         }
@@ -764,6 +929,7 @@
         function deleteExpense(idx) {
             const monthData = data.months[getMonthKey()];
             monthData.expenses.splice(idx, 1);
+            saveData();
             updateDisplay();
         }
 
@@ -792,6 +958,7 @@
                 const monthData = data.months[getMonthKey()];
                 monthData.expenses[currentExpenseId].subitems.push({ name, amount });
                 closeSubitemModal();
+                saveData();
                 updateDisplay();
             }
         }
@@ -799,11 +966,16 @@
         function deleteSubitem(expenseIdx, subitemIdx) {
             const monthData = data.months[getMonthKey()];
             monthData.expenses[expenseIdx].subitems.splice(subitemIdx, 1);
+            saveData();
             updateDisplay();
         }
 
-        // Initialize
-        updateDisplay();
+        async function init() {
+            await loadData();
+            updateDisplay();
+        }
+        
+        init();
     </script>
 </body>
 </html>
