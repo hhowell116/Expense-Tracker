@@ -80,6 +80,25 @@
             text-align: center;
             color: white;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .piggy-edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .piggy-edit-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
         .piggy-bank .label {
@@ -428,6 +447,7 @@
         </div>
 
         <div class="piggy-bank">
+            <button class="piggy-edit-btn" onclick="editPiggyBank()">Edit</button>
             <div class="label">🐷 Piggy Bank</div>
             <div class="amount" id="piggyBank">$0.00</div>
         </div>
@@ -446,7 +466,7 @@
                 <div class="card-amount" id="totalSaved">$0</div>
             </div>
             <div class="card action" onclick="addToPiggyBank()">
-                <div class="card-label">💰 Add to Piggy Bank</div>
+                <div class="card-label">💰 Add This Month's Savings</div>
             </div>
         </div>
 
@@ -516,6 +536,21 @@
             <div class="modal-buttons">
                 <button class="btn-secondary" onclick="closeSubitemModal()">Cancel</button>
                 <button class="btn-primary" onclick="addSubitem()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Piggy Bank Edit Modal -->
+    <div class="modal" id="piggyBankModal">
+        <div class="modal-content">
+            <div class="modal-title">Edit Piggy Bank</div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="piggyBankAmount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closePiggyBankModal()">Cancel</button>
+                <button class="btn-primary" onclick="savePiggyBank()">Save</button>
             </div>
         </div>
     </div>
