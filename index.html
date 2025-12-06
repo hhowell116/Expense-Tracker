@@ -593,6 +593,9 @@
                     <div class="menu-item" id="shareBtn">
                         👥 Share Tracker
                     </div>
+                    <div class="menu-item" id="switchToOwnBtn">
+                        🔄 Use My Own Tracker
+                    </div>
                     <div class="menu-item logout" id="signOutBtn">
                         🚪 Sign Out
                     </div>
@@ -918,6 +921,13 @@
         document.getElementById('shareBtn').addEventListener('click', () => {
             document.getElementById('userMenu').classList.remove('show');
             document.getElementById('shareModal').classList.add('show');
+        });
+
+        document.getElementById('switchToOwnBtn').addEventListener('click', () => {
+            if (currentUser) {
+                localStorage.setItem(`trackerId_${currentUser.email}`, currentUser.email);
+                location.reload();
+            }
         });
 
         document.getElementById('cancelShareBtn').addEventListener('click', () => {
