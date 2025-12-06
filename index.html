@@ -90,15 +90,18 @@
             background: rgba(255, 255, 255, 0.3);
             border: none;
             color: white;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: bold;
             transition: all 0.3s;
+            z-index: 10;
         }
 
         .piggy-edit-btn:hover {
             background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
         }
 
         .piggy-bank .label {
@@ -600,6 +603,25 @@
                 alert(`${saved.toFixed(2)} added to Piggy Bank!`);
             } else {
                 alert('No savings to add this month.');
+            }
+        }
+
+        function editPiggyBank() {
+            document.getElementById('piggyBankAmount').value = data.piggyBank;
+            document.getElementById('piggyBankModal').classList.add('show');
+        }
+
+        function closePiggyBankModal() {
+            document.getElementById('piggyBankModal').classList.remove('show');
+        }
+
+        function savePiggyBank() {
+            const amount = parseFloat(document.getElementById('piggyBankAmount').value);
+            
+            if (!isNaN(amount) && amount >= 0) {
+                data.piggyBank = amount;
+                closePiggyBankModal();
+                updateDisplay();
             }
         }
 
