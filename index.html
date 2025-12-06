@@ -96,44 +96,33 @@
             height: 35px;
             border-radius: 50%;
             border: 2px solid #667eea;
-        }
-
-        .hamburger-menu {
-            position: relative;
-        }
-
-        .hamburger-btn {
-            background: transparent;
-            border: none;
-            font-size: 24px;
             cursor: pointer;
-            padding: 5px 10px;
-            color: #667eea;
             transition: all 0.3s;
         }
 
-        .hamburger-btn:hover {
-            color: #764ba2;
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
         }
 
-        .dropdown-menu {
+        .user-menu {
             position: absolute;
-            top: 40px;
+            top: 45px;
             right: 0;
             background: white;
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             padding: 10px;
-            min-width: 180px;
+            min-width: 200px;
             display: none;
             z-index: 1000;
         }
 
-        .dropdown-menu.show {
+        .user-menu.show {
             display: block;
         }
 
-        .dropdown-item {
+        .menu-item {
             padding: 12px 15px;
             cursor: pointer;
             border-radius: 6px;
@@ -145,11 +134,11 @@
             font-size: 14px;
         }
 
-        .dropdown-item:hover {
+        .menu-item:hover {
             background: #f0f0f0;
         }
 
-        .dropdown-item.logout {
+        .menu-item.logout {
             color: #ff4757;
             border-top: 1px solid #e0e0e0;
             margin-top: 5px;
@@ -505,6 +494,22 @@
             display: none !important;
         }
 
+        .share-info {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1976D2;
+        }
+
+        .share-info strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -581,28 +586,33 @@
         <div class="header">
             <div class="user-info">
                 <img id="userAvatar" class="user-avatar" src="" alt="User">
-                <div class="hamburger-menu">
-                    <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
-                    <div class="dropdown-menu" id="dropdownMenu">
-                        <div class="dropdown-item" onclick="toggleMenu()">
-                            <span id="userName">User</span>
-                        </div>
-                        <div class="dropdown-item logout" onclick="signOut()">
-                            🚪 Sign Out
-                        </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="menu-item">
+                        <span id="userName">User</span>
+                    </div>
+                    <div class="menu-item" id="shareBtn">
+                        👥 Share Tracker
+                    </div>
+                    <div class="menu-item logout" id="signOutBtn">
+                        🚪 Sign Out
                     </div>
                 </div>
             </div>
             <h1>Expense Tracker</h1>
             <div class="month-nav">
-                <button onclick="prevMonth()">←</button>
+                <button id="prevMonthBtn">←</button>
                 <div class="month-display" id="monthDisplay"></div>
-                <button onclick="nextMonth()">→</button>
+                <button id="nextMonthBtn">→</button>
             </div>
         </div>
 
+        <div id="shareInfo" class="share-info hidden">
+            <strong>📧 Share this tracker ID with your partner:</strong>
+            <div id="trackerIdDisplay" style="font-family: monospace; font-size: 16px; margin-top: 5px;"></div>
+        </div>
+
         <div class="piggy-bank">
-            <button class="piggy-edit-btn" onclick="editPiggyBank()">Edit</button>
+            <button class="piggy-edit-btn" id="editPiggyBtn">Edit</button>
             <div class="label">🐷 Piggy Bank</div>
             <div class="amount" id="piggyBank">$0.00</div>
         </div>
@@ -620,7 +630,7 @@
                 <div class="card-label">Saved</div>
                 <div class="card-amount" id="totalSaved">$0</div>
             </div>
-            <div class="card action" onclick="addToPiggyBank()">
+            <div class="card action" id="addSavingsBtn">
                 <div class="card-label">💰 Add This Month's Savings</div>
             </div>
         </div>
@@ -628,7 +638,7 @@
         <div class="section">
             <div class="section-title">
                 <span>Income Sources</span>
-                <button class="add-btn" onclick="openIncomeModal()">+ Add Income</button>
+                <button class="add-btn" id="addIncomeBtn">+ Add Income</button>
             </div>
             <div class="income-list" id="incomeList"></div>
         </div>
@@ -636,7 +646,7 @@
         <div class="section">
             <div class="section-title">
                 <span>Expenses</span>
-                <button class="add-btn" onclick="openExpenseModal()">+ Add Expense</button>
+                <button class="add-btn" id="addExpenseBtn">+ Add Expense</button>
             </div>
             <div class="expense-list" id="expenseList"></div>
         </div>
@@ -655,8 +665,8 @@
                 <input type="number" id="incomeAmount" placeholder="0.00" step="0.01">
             </div>
             <div class="modal-buttons">
-                <button class="btn-secondary" onclick="closeIncomeModal()">Cancel</button>
-                <button class="btn-primary" onclick="saveIncome()">Save</button>
+                <button class="btn-secondary" id="cancelIncomeBtn">Cancel</button>
+                <button class="btn-primary" id="saveIncomeBtn">Save</button>
             </div>
         </div>
     </div>
@@ -670,8 +680,8 @@
                 <input type="text" id="expenseName" placeholder="e.g., Groceries">
             </div>
             <div class="modal-buttons">
-                <button class="btn-secondary" onclick="closeExpenseModal()">Cancel</button>
-                <button class="btn-primary" onclick="addExpense()">Add</button>
+                <button class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                <button class="btn-primary" id="saveExpenseBtn">Add</button>
             </div>
         </div>
     </div>
@@ -689,8 +699,8 @@
                 <input type="number" id="subitemAmount" placeholder="0.00" step="0.01">
             </div>
             <div class="modal-buttons">
-                <button class="btn-secondary" onclick="closeSubitemModal()">Cancel</button>
-                <button class="btn-primary" onclick="addSubitem()">Add</button>
+                <button class="btn-secondary" id="cancelSubitemBtn">Cancel</button>
+                <button class="btn-primary" id="saveSubitemBtn">Add</button>
             </div>
         </div>
     </div>
@@ -704,8 +714,26 @@
                 <input type="number" id="piggyBankAmount" placeholder="0.00" step="0.01">
             </div>
             <div class="modal-buttons">
-                <button class="btn-secondary" onclick="closePiggyBankModal()">Cancel</button>
-                <button class="btn-primary" onclick="savePiggyBank()">Save</button>
+                <button class="btn-secondary" id="cancelPiggyBtn">Cancel</button>
+                <button class="btn-primary" id="savePiggyBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-title">Share Expense Tracker</div>
+            <div class="form-group">
+                <label>Enter your partner's Tracker ID (their email):</label>
+                <input type="email" id="partnerEmail" placeholder="partner@example.com">
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Or share your email with them: <strong id="yourEmail"></strong>
+                </p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelShareBtn">Cancel</button>
+                <button class="btn-primary" id="saveShareBtn">Connect</button>
             </div>
         </div>
     </div>
@@ -731,6 +759,7 @@
         
         let currentUser = null;
         let unsubscribe = null;
+        let trackerId = null;
 
         // Sign in function
         async function signInWithGoogle() {
@@ -744,85 +773,147 @@
         }
 
         // Sign out function
-        window.signOut = async function() {
+        async function signOut() {
             try {
                 if (unsubscribe) unsubscribe();
                 await firebaseSignOut(auth);
                 document.getElementById('loginContainer').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
-                const menu = document.getElementById('dropdownMenu');
+                const menu = document.getElementById('userMenu');
                 if (menu) menu.classList.remove('show');
             } catch (error) {
                 console.error('Sign out error:', error);
             }
-        };
+        }
 
         // Listen for auth state changes
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                trackerId = user.email;
+                
                 document.getElementById('loginContainer').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 document.getElementById('userAvatar').src = user.photoURL || '';
                 document.getElementById('userName').textContent = user.displayName || user.email;
+                document.getElementById('yourEmail').textContent = user.email;
                 
                 // Load user data from Firestore
-                await loadUserData(user.uid);
+                await loadUserData();
                 
                 // Set up real-time listener
-                const docRef = doc(db, 'users', user.uid);
+                const docRef = doc(db, 'trackers', trackerId);
                 unsubscribe = onSnapshot(docRef, (doc) => {
                     if (doc.exists()) {
-                        window.data = doc.data();
-                        updateDisplay();
+                        window.appData = doc.data();
+                        window.updateDisplay();
                     }
                 });
             } else {
                 currentUser = null;
+                trackerId = null;
                 document.getElementById('loginContainer').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
             }
         });
 
-        async function loadUserData(uid) {
-            const docRef = doc(db, 'users', uid);
+        async function loadUserData() {
+            const docRef = doc(db, 'trackers', trackerId);
             const docSnap = await getDoc(docRef);
             
             if (docSnap.exists()) {
-                window.data = docSnap.data();
+                window.appData = docSnap.data();
             } else {
-                // Initialize new user data
-                window.data = {
+                // Initialize new tracker data
+                window.appData = {
                     incomes: [],
                     months: {},
-                    piggyBank: 0
+                    piggyBank: 0,
+                    sharedWith: []
                 };
                 await saveData();
             }
-            updateDisplay();
+            window.updateDisplay();
         }
 
         window.saveData = async function() {
-            if (!currentUser) return;
+            if (!trackerId) return;
             try {
-                const docRef = doc(db, 'users', currentUser.uid);
-                await setDoc(docRef, window.data);
+                const docRef = doc(db, 'trackers', trackerId);
+                await setDoc(docRef, window.appData);
             } catch (error) {
                 console.error('Error saving data:', error);
                 alert('Failed to save data. Please try again.');
             }
         };
 
-        // Attach sign in to button
+        window.shareTracker = async function() {
+            const partnerEmail = document.getElementById('partnerEmail').value.trim();
+            if (!partnerEmail) {
+                alert('Please enter your partner\'s email');
+                return;
+            }
+
+            try {
+                // Load partner's data
+                const partnerDocRef = doc(db, 'trackers', partnerEmail);
+                const partnerDoc = await getDoc(partnerDocRef);
+
+                if (partnerDoc.exists()) {
+                    // Partner exists, merge data or switch to their tracker
+                    trackerId = partnerEmail;
+                    await loadUserData();
+                    document.getElementById('shareModal').classList.remove('show');
+                    alert('Connected! You are now sharing this tracker.');
+                } else {
+                    alert('Partner not found. Make sure they sign in first and share their email with you.');
+                }
+            } catch (error) {
+                console.error('Error sharing:', error);
+                alert('Failed to connect. Please try again.');
+            }
+        };
+
+        // Event listeners
         document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
+        document.getElementById('signOutBtn').addEventListener('click', signOut);
+        
+        // User avatar menu toggle
+        document.getElementById('userAvatar').addEventListener('click', () => {
+            document.getElementById('userMenu').classList.toggle('show');
+        });
+
+        // Share button
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            document.getElementById('userMenu').classList.remove('show');
+            document.getElementById('shareModal').classList.add('show');
+        });
+
+        document.getElementById('cancelShareBtn').addEventListener('click', () => {
+            document.getElementById('shareModal').classList.remove('show');
+        });
+
+        document.getElementById('saveShareBtn').addEventListener('click', () => {
+            window.shareTracker();
+        });
+
+        // Close menus when clicking outside
+        document.addEventListener('click', (e) => {
+            const userMenu = document.getElementById('userMenu');
+            const userAvatar = document.getElementById('userAvatar');
+            if (userMenu && !userMenu.contains(e.target) && e.target !== userAvatar) {
+                userMenu.classList.remove('show');
+            }
+        });
     </script>
 
     <script>
         let currentDate = new Date();
-        let data = {
+        let appData = {
             incomes: [],
             months: {},
-            piggyBank: 0
+            piggyBank: 0,
+            sharedWith: []
         };
         let currentExpenseId = null;
         let editingIncomeIdx = null;
@@ -833,90 +924,4 @@
 
         function initMonth() {
             const key = getMonthKey();
-            if (!data.months[key]) {
-                data.months[key] = {
-                    expenses: [],
-                    addedToPiggyBank: false
-                };
-            }
-        }
-
-        function toggleMenu() {
-            document.getElementById('dropdownMenu').classList.toggle('show');
-        }
-
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('dropdownMenu');
-            const hamburger = document.querySelector('.hamburger-btn');
-            if (menu && !menu.contains(event.target) && event.target !== hamburger) {
-                menu.classList.remove('show');
-            }
-        });
-
-        function addToPiggyBank() {
-            const monthData = data.months[getMonthKey()];
-            
-            if (monthData.addedToPiggyBank) {
-                alert('This month\'s savings have already been added to the Piggy Bank!');
-                return;
-            }
-
-            const totalIncome = data.incomes.reduce((sum, inc) => sum + inc.amount, 0);
-            const totalSpent = monthData.expenses.reduce((sum, exp) => {
-                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
-            }, 0);
-            const saved = totalIncome - totalSpent;
-
-            if (saved > 0) {
-                data.piggyBank += saved;
-                monthData.addedToPiggyBank = true;
-                saveData();
-                updateDisplay();
-                alert(`$${saved.toFixed(2)} added to Piggy Bank!`);
-            } else {
-                alert('No savings to add this month.');
-            }
-        }
-
-        function editPiggyBank() {
-            document.getElementById('piggyBankAmount').value = data.piggyBank;
-            document.getElementById('piggyBankModal').classList.add('show');
-        }
-
-        function closePiggyBankModal() {
-            document.getElementById('piggyBankModal').classList.remove('show');
-        }
-
-        function savePiggyBank() {
-            const amount = parseFloat(document.getElementById('piggyBankAmount').value);
-            
-            if (!isNaN(amount) && amount >= 0) {
-                data.piggyBank = amount;
-                closePiggyBankModal();
-                saveData();
-                updateDisplay();
-            }
-        }
-
-        function updateDisplay() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                          'July', 'August', 'September', 'October', 'November', 'December'];
-            document.getElementById('monthDisplay').textContent = 
-                `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            
-            initMonth();
-            const monthData = data.months[getMonthKey()];
-            
-            const totalIncome = data.incomes.reduce((sum, inc) => sum + inc.amount, 0);
-            const totalSpent = monthData.expenses.reduce((sum, exp) => {
-                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
-            }, 0);
-            const saved = totalIncome - totalSpent;
-
-            document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
-            document.getElementById('totalSpent').textContent = `$${totalSpent.toFixed(2)}`;
-            document.getElementById('totalSaved').textContent = `$${saved.toFixed(2)}`;
-            document.getElementById('piggyBank').textContent = `$${data.piggyBank.toFixed(2)}`;
-
-            const incomeList = document.getElementById('incomeList');
-            incomeList.innerHTML = data.incomes.map((inc, idx
+            if (!appData.months[key
