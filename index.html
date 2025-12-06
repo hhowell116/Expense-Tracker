@@ -786,7 +786,10 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                trackerId = user.email;
+                
+                // Check if user has a saved shared tracker preference
+                const savedTrackerId = localStorage.getItem(`trackerId_${user.email}`);
+                trackerId = savedTrackerId || user.email;
                 
                 document.getElementById('loginContainer').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
@@ -852,11 +855,31 @@
                 return;
             }
 
+            if (partnerEmail === currentUser.email) {
+                alert('You cannot share with yourself!');
+                return;
+            }
+
             try {
                 const partnerDocRef = doc(db, 'trackers', partnerEmail);
                 const partnerDoc = await getDoc(partnerDocRef);
 
                 if (partnerDoc.exists()) {
+                    // Add current user to partner's sharedWith array
+                    const partnerData = partnerDoc.data();
+                    if (!partnerData.sharedWith) {
+                        partnerData.sharedWith = [];
+                    }
+                    
+                    if (!partnerData.sharedWith.includes(currentUser.email)) {
+                        partnerData.sharedWith.push(currentUser.email);
+                        await setDoc(partnerDocRef, partnerData);
+                    }
+
+                    // Save preference to remember this shared tracker
+                    localStorage.setItem(`trackerId_${currentUser.email}`, partnerEmail);
+
+                    // Switch to partner's tracker
                     trackerId = partnerEmail;
                     if (unsubscribe) unsubscribe();
                     await loadUserData();
@@ -872,13 +895,16 @@
                     });
                     
                     document.getElementById('shareModal').classList.remove('show');
-                    alert('Connected! You are now sharing this tracker.');
+                    alert('Connected! You are now sharing this tracker. Refresh to see updates.');
+                    
+                    // Reload the page to reinitialize with the new tracker
+                    setTimeout(() => location.reload(), 1000);
                 } else {
                     alert('Partner not found. Make sure they sign in first and share their email with you.');
                 }
             } catch (error) {
                 console.error('Error sharing:', error);
-                alert('Failed to connect. Please try again.');
+                alert('Failed to connect. Please check the email and try again.');
             }
         };
 
