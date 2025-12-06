@@ -914,4 +914,161 @@
             document.getElementById('piggyBank').textContent = `$${data.piggyBank.toFixed(2)}`;
 
             const incomeList = document.getElementById('incomeList');
-            income
+            incomeList.innerHTML = data.incomes.map((inc, idx) => `
+                <div class="income-item">
+                    <div class="income-item-content">
+                        <strong>${inc.name}</strong>
+                    </div>
+                    <span>
+                        ${inc.amount.toFixed(2)}
+                        <button class="edit-btn" onclick="editIncome(${idx})">Edit</button>
+                    </span>
+                </div>
+            `).join('');
+
+            const expenseList = document.getElementById('expenseList');
+            expenseList.innerHTML = monthData.expenses.map((exp, idx) => {
+                const total = exp.subitems.reduce((s, sub) => s + sub.amount, 0);
+                const percentage = totalIncome > 0 ? (total / totalIncome) * 100 : 0;
+                return `
+                    <div class="expense-item">
+                        <div class="expense-header" onclick="toggleExpense(${idx})">
+                            <span><strong>${exp.name}</strong> (${exp.subitems.length} items)</span>
+                            <span>
+                                ${total.toFixed(2)}
+                                <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${idx})">Delete</button>
+                            </span>
+                        </div>
+                        <div class="expense-bar" style="width: ${Math.min(percentage, 100)}%"></div>
+                        <button class="add-btn" style="margin-top: 10px;" onclick="event.stopPropagation(); openSubitemModal(${idx})">+ Add Item</button>
+                        <div class="expense-subitems" id="expense-${idx}">
+                            ${exp.subitems.map((sub, subIdx) => `
+                                <div class="subitem">
+                                    <span>${sub.name}</span>
+                                    <span>
+                                        ${sub.amount.toFixed(2)}
+                                        <button class="delete-btn" onclick="deleteSubitem(${idx}, ${subIdx})">Delete</button>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateDisplay();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateDisplay();
+        }
+
+        function openIncomeModal() {
+            editingIncomeIdx = null;
+            document.getElementById('incomeModalTitle').textContent = 'Add Income';
+            document.getElementById('incomeModal').classList.add('show');
+            document.getElementById('incomeName').value = '';
+            document.getElementById('incomeAmount').value = '';
+        }
+
+        function closeIncomeModal() {
+            document.getElementById('incomeModal').classList.remove('show');
+            editingIncomeIdx = null;
+        }
+
+        function editIncome(idx) {
+            editingIncomeIdx = idx;
+            const income = data.incomes[idx];
+            document.getElementById('incomeModalTitle').textContent = 'Edit Income';
+            document.getElementById('incomeName').value = income.name;
+            document.getElementById('incomeAmount').value = income.amount;
+            document.getElementById('incomeModal').classList.add('show');
+        }
+
+        function saveIncome() {
+            const name = document.getElementById('incomeName').value;
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            
+            if (name && amount > 0) {
+                if (editingIncomeIdx !== null) {
+                    data.incomes[editingIncomeIdx] = { name, amount };
+                } else {
+                    data.incomes.push({ name, amount });
+                }
+                closeIncomeModal();
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function openExpenseModal() {
+            document.getElementById('expenseModal').classList.add('show');
+            document.getElementById('expenseName').value = '';
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('show');
+        }
+
+        function addExpense() {
+            const name = document.getElementById('expenseName').value;
+            
+            if (name) {
+                const monthData = data.months[getMonthKey()];
+                monthData.expenses.push({ name, subitems: [] });
+                closeExpenseModal();
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function deleteExpense(idx) {
+            const monthData = data.months[getMonthKey()];
+            monthData.expenses.splice(idx, 1);
+            saveData();
+            updateDisplay();
+        }
+
+        function toggleExpense(idx) {
+            const elem = document.getElementById(`expense-${idx}`);
+            elem.classList.toggle('show');
+        }
+
+        function openSubitemModal(expenseIdx) {
+            currentExpenseId = expenseIdx;
+            document.getElementById('subitemModal').classList.add('show');
+            document.getElementById('subitemName').value = '';
+            document.getElementById('subitemAmount').value = '';
+        }
+
+        function closeSubitemModal() {
+            document.getElementById('subitemModal').classList.remove('show');
+            currentExpenseId = null;
+        }
+
+        function addSubitem() {
+            const name = document.getElementById('subitemName').value;
+            const amount = parseFloat(document.getElementById('subitemAmount').value);
+            
+            if (name && amount > 0 && currentExpenseId !== null) {
+                const monthData = data.months[getMonthKey()];
+                monthData.expenses[currentExpenseId].subitems.push({ name, amount });
+                closeSubitemModal();
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function deleteSubitem(expenseIdx, subitemIdx) {
+            const monthData = data.months[getMonthKey()];
+            monthData.expenses[expenseIdx].subitems.splice(subitemIdx, 1);
+            saveData();
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
