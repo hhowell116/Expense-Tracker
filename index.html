@@ -947,3 +947,821 @@
                 <div class="card-label">💰 Add Savings to Piggy Bank</div>
             </div>
         </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>💵 Income Sources</span>
+                <button class="add-btn" id="addIncomeBtn">+ Add Income</button>
+            </div>
+            <div class="income-container">
+                <div class="income-items-wrapper">
+                    <div class="income-list" id="incomeList"></div>
+                </div>
+                <div class="income-chart-container">
+                    <div class="income-chart-title">Income vs Expenses</div>
+                    <canvas id="incomeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>💳 Expenses</span>
+                <button class="add-btn" id="addExpenseBtn">+ Add Expense</button>
+            </div>
+            <div class="expense-list" id="expenseList"></div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Adding Savings -->
+    <div class="modal" id="confirmSavingsModal">
+        <div class="modal-content">
+            <div class="modal-title">Add Savings to Piggy Bank?</div>
+            <p class="confirm-text">This should be pressed at the end of the month. Are you sure you're ready to add this month's savings to your Piggy Bank?</p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelSavingsBtn">No</button>
+                <button class="btn-primary" id="confirmSavingsBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income Modal -->
+    <div class="modal" id="incomeModal">
+        <div class="modal-content">
+            <div class="modal-title" id="incomeModalTitle">Add Income</div>
+            <div class="form-group">
+                <label>Source Name</label>
+                <input type="text" id="incomeName" placeholder="e.g., Your Salary">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="incomeAmount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelIncomeBtn">Cancel</button>
+                <button class="btn-primary" id="saveIncomeBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-title">Add Expense Category</div>
+            <div class="form-group">
+                <label>Category Name</label>
+                <input type="text" id="expenseName" placeholder="e.g., Groceries">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                <button class="btn-primary" id="saveExpenseBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subitem Modal -->
+    <div class="modal" id="subitemModal">
+        <div class="modal-content">
+            <div class="modal-title">Add Item</div>
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text" id="subitemName" placeholder="e.g., Bread">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="subitemAmount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelSubitemBtn">Cancel</button>
+                <button class="btn-primary" id="saveSubitemBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Piggy Bank Edit Modal -->
+    <div class="modal" id="piggyBankModal">
+        <div class="modal-content">
+            <div class="modal-title">Edit Piggy Bank</div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="piggyBankAmount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelPiggyBtn">Cancel</button>
+                <button class="btn-primary" id="savePiggyBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-title">Share Expense Tracker</div>
+            <div class="form-group">
+                <label>Enter your partner's Tracker ID (their email):</label>
+                <input type="email" id="partnerEmail" placeholder="partner@example.com">
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                    Or share your email with them: <strong id="yourEmail"></strong>
+                </p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelShareBtn">Cancel</button>
+                <button class="btn-primary" id="saveShareBtn">Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut as firebaseSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDF94pM__lUv4cc1vho0p4WMjkAF8N3qZE",
+            authDomain: "monthly-expense-tracker-1ecba.firebaseapp.com",
+            projectId: "monthly-expense-tracker-1ecba",
+            storageBucket: "monthly-expense-tracker-1ecba.firebasestorage.app",
+            messagingSenderId: "1012162422410",
+            appId: "1:1012162422410:web:65d7686b5871cfc4d3af73"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let currentUser = null;
+        let unsubscribe = null;
+        let trackerId = null;
+
+        // Load theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
+
+        async function signInWithGoogle() {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error('Sign in error:', error);
+                alert('Failed to sign in. Please try again.');
+            }
+        }
+
+        async function signOutUser() {
+            try {
+                if (unsubscribe) unsubscribe();
+                await firebaseSignOut(auth);
+                document.getElementById('loginContainer').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+                const menu = document.getElementById('userMenu');
+                if (menu) menu.classList.remove('show');
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                const savedTrackerId = localStorage.getItem(`trackerId_${user.email}`);
+                trackerId = savedTrackerId || user.email;
+                
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('userAvatar').src = user.photoURL || '';
+                document.getElementById('userName').textContent = user.displayName || user.email;
+                document.getElementById('yourEmail').textContent = user.email;
+                
+                await loadUserData();
+                
+                const docRef = doc(db, 'trackers', trackerId);
+                unsubscribe = onSnapshot(docRef, (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        window.appData = data;
+                        if (window.updateDisplay) {
+                            window.updateDisplay();
+                        }
+                    }
+                });
+            } else {
+                currentUser = null;
+                trackerId = null;
+                document.getElementById('loginContainer').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+            }
+        });
+
+        async function loadUserData() {
+            const docRef = doc(db, 'trackers', trackerId);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                window.appData = docSnap.data();
+                
+                // Initialize default expense categories if they don't exist
+                if (!window.appData.defaultExpensesInitialized) {
+                    window.appData.defaultExpensesInitialized = true;
+                    await window.saveData();
+                }
+            } else {
+                window.appData = {
+                    incomes: [],
+                    months: {},
+                    piggyBank: 0,
+                    sharedWith: [],
+                    defaultExpensesInitialized: false
+                };
+                await window.saveData();
+            }
+            if (window.updateDisplay) {
+                window.updateDisplay();
+            }
+        }
+
+        window.saveData = async function() {
+            if (!trackerId) return;
+            try {
+                const docRef = doc(db, 'trackers', trackerId);
+                await setDoc(docRef, window.appData);
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Failed to save data. Please try again.');
+            }
+        };
+
+        window.shareTracker = async function() {
+            const partnerEmail = document.getElementById('partnerEmail').value.trim();
+            if (!partnerEmail) {
+                alert('Please enter your partner\'s email');
+                return;
+            }
+
+            if (partnerEmail === currentUser.email) {
+                alert('You cannot share with yourself!');
+                return;
+            }
+
+            try {
+                const partnerDocRef = doc(db, 'trackers', partnerEmail);
+                const partnerDoc = await getDoc(partnerDocRef);
+
+                if (partnerDoc.exists()) {
+                    const partnerData = partnerDoc.data();
+                    if (!partnerData.sharedWith) {
+                        partnerData.sharedWith = [];
+                    }
+                    
+                    if (!partnerData.sharedWith.includes(currentUser.email)) {
+                        partnerData.sharedWith.push(currentUser.email);
+                        await setDoc(partnerDocRef, partnerData);
+                    }
+
+                    localStorage.setItem(`trackerId_${currentUser.email}`, partnerEmail);
+                    localStorage.setItem(`sharedTrackerId_${currentUser.email}`, partnerEmail);
+
+                    trackerId = partnerEmail;
+                    if (unsubscribe) unsubscribe();
+                    await loadUserData();
+                    
+                    const docRef = doc(db, 'trackers', trackerId);
+                    unsubscribe = onSnapshot(docRef, (doc) => {
+                        if (doc.exists()) {
+                            window.appData = doc.data();
+                            if (window.updateDisplay) {
+                                window.updateDisplay();
+                            }
+                        }
+                    });
+                    
+                    document.getElementById('shareModal').classList.remove('show');
+                    alert('Connected! You are now sharing this tracker. Refresh to see updates.');
+                    
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    alert('Partner not found. Make sure they sign in first and share their email with you.');
+                }
+            } catch (error) {
+                console.error('Error sharing:', error);
+                alert('Failed to connect. Please check the email and try again.');
+            }
+        };
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('themeToggle').textContent = isLight ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
+            document.getElementById('userMenu').classList.remove('show');
+            
+            // Update chart if it exists
+            if (window.updateDisplay) {
+                window.updateDisplay();
+            }
+        });
+
+        // Update theme toggle text on load
+        document.getElementById('themeToggle').textContent = 
+            document.body.classList.contains('light-mode') ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
+
+        document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
+        document.getElementById('signOutBtn').addEventListener('click', signOutUser);
+        
+        document.getElementById('userAvatar').addEventListener('click', () => {
+            document.getElementById('userMenu').classList.toggle('show');
+        });
+
+        document.getElementById('hamburgerIcon').addEventListener('click', () => {
+            document.getElementById('userMenu').classList.toggle('show');
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            document.getElementById('userMenu').classList.remove('show');
+            document.getElementById('shareModal').classList.add('show');
+        });
+
+        document.getElementById('switchToOwnBtn').addEventListener('click', () => {
+            if (currentUser) {
+                localStorage.setItem(`trackerId_${currentUser.email}`, currentUser.email);
+                document.getElementById('userMenu').classList.remove('show');
+                location.reload();
+            }
+        });
+
+        document.getElementById('switchToSharedBtn').addEventListener('click', () => {
+            if (currentUser) {
+                const sharedTrackerId = localStorage.getItem(`sharedTrackerId_${currentUser.email}`);
+                const currentTrackerId = localStorage.getItem(`trackerId_${currentUser.email}`);
+                
+                if (sharedTrackerId && sharedTrackerId !== currentUser.email) {
+                    if (currentTrackerId === sharedTrackerId) {
+                        alert('You are already viewing the shared tracker!');
+                    } else {
+                        localStorage.setItem(`trackerId_${currentUser.email}`, sharedTrackerId);
+                        document.getElementById('userMenu').classList.remove('show');
+                        location.reload();
+                    }
+                } else {
+                    alert('You don\'t have a shared tracker yet. Use "Share Tracker" to connect with a partner.');
+                }
+                document.getElementById('userMenu').classList.remove('show');
+            }
+        });
+
+        document.getElementById('cancelShareBtn').addEventListener('click', () => {
+            document.getElementById('shareModal').classList.remove('show');
+        });
+
+        document.getElementById('saveShareBtn').addEventListener('click', () => {
+            window.shareTracker();
+        });
+
+        document.addEventListener('click', (e) => {
+            const userMenu = document.getElementById('userMenu');
+            const userAvatar = document.getElementById('userAvatar');
+            const hamburgerIcon = document.getElementById('hamburgerIcon');
+            if (userMenu && !userMenu.contains(e.target) && e.target !== userAvatar && !hamburgerIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+            }
+        });
+    </script>
+
+    <script>
+        let currentDate = new Date();
+        let currentExpenseId = null;
+        let editingIncomeIdx = null;
+        let incomeChart = null;
+        
+        // Default expense categories
+        const DEFAULT_EXPENSES = ['Bills', 'Groceries', 'Food/Drinks', 'Shopping'];
+        
+        window.appData = {
+            incomes: [],
+            months: {},
+            piggyBank: 0,
+            sharedWith: [],
+            defaultExpensesInitialized: false
+        };
+
+        function getMonthKey() {
+            return `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        }
+
+        function initMonth() {
+            const key = getMonthKey();
+            if (!window.appData.months[key]) {
+                window.appData.months[key] = {
+                    expenses: [],
+                    addedToPiggyBank: false
+                };
+                
+                // Add default expense categories for new months
+                DEFAULT_EXPENSES.forEach(category => {
+                    window.appData.months[key].expenses.push({ 
+                        name: category, 
+                        subitems: [],
+                        isDefault: true 
+                    });
+                });
+                
+                window.saveData();
+            } else {
+                // Ensure default categories exist for existing months
+                DEFAULT_EXPENSES.forEach(category => {
+                    const exists = window.appData.months[key].expenses.some(exp => exp.name === category);
+                    if (!exists) {
+                        window.appData.months[key].expenses.unshift({ 
+                            name: category, 
+                            subitems: [],
+                            isDefault: true 
+                        });
+                    }
+                });
+            }
+        }
+
+        window.updateDisplay = function() {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('monthDisplay').textContent = 
+                `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            initMonth();
+            const monthData = window.appData.months[getMonthKey()];
+            
+            const totalIncome = window.appData.incomes.reduce((sum, inc) => sum + inc.amount, 0);
+            const totalSpent = monthData.expenses.reduce((sum, exp) => {
+                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
+            }, 0);
+            const saved = totalIncome - totalSpent;
+
+            document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)}`;
+            document.getElementById('totalSpent').textContent = `${totalSpent.toFixed(2)}`;
+            document.getElementById('totalSaved').textContent = `${saved.toFixed(2)}`;
+            document.getElementById('piggyBank').textContent = `${window.appData.piggyBank.toFixed(2)}`;
+
+            const incomeList = document.getElementById('incomeList');
+            incomeList.innerHTML = window.appData.incomes.map((inc, idx) => `
+                <div class="income-item" data-income-id="${idx}">
+                    <div class="income-item-header">
+                        <div class="income-item-content">
+                            <strong>${inc.name}</strong>
+                        </div>
+                        <div class="income-amount-section">
+                            <span class="income-amount">${inc.amount.toFixed(2)}</span>
+                            <span class="income-toggle-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="income-item-details">
+                        <button class="edit-btn" data-edit-income="${idx}">Edit Amount</button>
+                        <button class="delete-btn" data-delete-income="${idx}" style="margin-left: 10px;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.income-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('button')) {
+                        this.classList.toggle('expanded');
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-edit-income]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    editIncome(parseInt(this.getAttribute('data-edit-income')));
+                });
+            });
+
+            document.querySelectorAll('[data-delete-income]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = parseInt(this.getAttribute('data-delete-income'));
+                    if (confirm('Are you sure you want to delete this income source?')) {
+                        window.appData.incomes.splice(idx, 1);
+                        window.saveData();
+                        window.updateDisplay();
+                    }
+                });
+            });
+
+            updateIncomeChart(totalIncome, totalSpent);
+
+            const expenseList = document.getElementById('expenseList');
+            expenseList.innerHTML = monthData.expenses.map((exp, idx) => {
+                const total = exp.subitems.reduce((s, sub) => s + sub.amount, 0);
+                const percentage = totalIncome > 0 ? (total / totalIncome) * 100 : 0;
+                const itemCount = exp.subitems.length;
+                return `
+                    <div class="expense-item" data-expense-id="${idx}">
+                        <div class="expense-header" data-toggle-expense="${idx}">
+                            <div class="expense-header-left">
+                                <strong>${exp.name}</strong>
+                                <span class="expense-item-count">${itemCount} ${itemCount === 1 ? 'item' : 'items'}</span>
+                            </div>
+                            <div class="expense-amount-section">
+                                <span class="expense-total">${total.toFixed(2)}</span>
+                                <span class="expense-percentage">${percentage.toFixed(1)}% of income</span>
+                            </div>
+                        </div>
+                        <div class="expense-bar" style="width: ${Math.min(percentage, 100)}%"></div>
+                        <div class="expense-actions">
+                            <button class="add-btn" data-add-subitem="${idx}">+ Add Item</button>
+                            ${!exp.isDefault ? `<button class="delete-btn" data-delete-expense="${idx}">Delete Category</button>` : ''}
+                        </div>
+                        <div class="expense-subitems" id="expense-${idx}">
+                            ${exp.subitems.map((sub, subIdx) => `
+                                <div class="subitem">
+                                    <span class="subitem-name">${sub.name}</span>
+                                    <span class="subitem-amount">
+                                        ${sub.amount.toFixed(2)}
+                                        <button class="delete-btn" data-delete-subitem="${idx}-${subIdx}">Delete</button>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll('[data-toggle-expense]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.getAttribute('data-toggle-expense'));
+                    const expenseItem = document.querySelector(`[data-expense-id="${idx}"]`);
+                    const subitems = document.getElementById(`expense-${idx}`);
+                    expenseItem.classList.toggle('expanded');
+                    subitems.classList.toggle('show');
+                });
+            });
+
+            document.querySelectorAll('[data-delete-expense]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteExpense(parseInt(this.getAttribute('data-delete-expense')));
+                });
+            });
+
+            document.querySelectorAll('[data-add-subitem]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openSubitemModal(parseInt(this.getAttribute('data-add-subitem')));
+                });
+            });
+
+            document.querySelectorAll('[data-delete-subitem]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const [expIdx, subIdx] = this.getAttribute('data-delete-subitem').split('-').map(Number);
+                    deleteSubitem(expIdx, subIdx);
+                });
+            });
+        };
+
+        function updateIncomeChart(totalIncome, totalSpent) {
+            const ctx = document.getElementById('incomeChart');
+            if (!ctx) return;
+
+            const remaining = Math.max(0, totalIncome - totalSpent);
+
+            if (incomeChart) {
+                incomeChart.destroy();
+            }
+
+            const isDark = !document.body.classList.contains('light-mode');
+
+            incomeChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Spent', 'Remaining'],
+                    datasets: [{
+                        data: [totalSpent, remaining],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                color: isDark ? '#e4e6eb' : '#2d3436'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const percentage = totalIncome > 0 ? ((value / totalIncome) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showConfirmSavingsModal() {
+            document.getElementById('confirmSavingsModal').classList.add('show');
+        }
+
+        function closeConfirmSavingsModal() {
+            document.getElementById('confirmSavingsModal').classList.remove('show');
+        }
+
+        function addToPiggyBank() {
+            const monthData = window.appData.months[getMonthKey()];
+            
+            if (monthData.addedToPiggyBank) {
+                alert('This month\'s savings have already been added to the Piggy Bank!');
+                return;
+            }
+
+            const totalIncome = window.appData.incomes.reduce((sum, inc) => sum + inc.amount, 0);
+            const totalSpent = monthData.expenses.reduce((sum, exp) => {
+                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
+            }, 0);
+            const saved = totalIncome - totalSpent;
+
+            if (saved > 0) {
+                window.appData.piggyBank += saved;
+                monthData.addedToPiggyBank = true;
+                window.saveData();
+                window.updateDisplay();
+                alert(`${saved.toFixed(2)} added to Piggy Bank!`);
+            } else {
+                alert('No savings to add this month.');
+            }
+            
+            closeConfirmSavingsModal();
+        }
+
+        function editPiggyBank() {
+            document.getElementById('piggyBankAmount').value = window.appData.piggyBank;
+            document.getElementById('piggyBankModal').classList.add('show');
+        }
+
+        function closePiggyBankModal() {
+            document.getElementById('piggyBankModal').classList.remove('show');
+        }
+
+        function savePiggyBank() {
+            const amount = parseFloat(document.getElementById('piggyBankAmount').value);
+            
+            if (!isNaN(amount) && amount >= 0) {
+                window.appData.piggyBank = amount;
+                closePiggyBankModal();
+                window.saveData();
+                window.updateDisplay();
+            }
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            window.updateDisplay();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            window.updateDisplay();
+        }
+
+        function openIncomeModal() {
+            editingIncomeIdx = null;
+            document.getElementById('incomeModalTitle').textContent = 'Add Income';
+            document.getElementById('incomeModal').classList.add('show');
+            document.getElementById('incomeName').value = '';
+            document.getElementById('incomeAmount').value = '';
+        }
+
+        function closeIncomeModal() {
+            document.getElementById('incomeModal').classList.remove('show');
+            editingIncomeIdx = null;
+        }
+
+        function editIncome(idx) {
+            editingIncomeIdx = idx;
+            const income = window.appData.incomes[idx];
+            document.getElementById('incomeModalTitle').textContent = 'Edit Income';
+            document.getElementById('incomeName').value = income.name;
+            document.getElementById('incomeAmount').value = income.amount;
+            document.getElementById('incomeModal').classList.add('show');
+        }
+
+        function saveIncome() {
+            const name = document.getElementById('incomeName').value;
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            
+            if (name && amount > 0) {
+                if (editingIncomeIdx !== null) {
+                    window.appData.incomes[editingIncomeIdx] = { name, amount };
+                } else {
+                    window.appData.incomes.push({ name, amount });
+                }
+                closeIncomeModal();
+                window.saveData();
+                window.updateDisplay();
+            }
+        }
+
+        function openExpenseModal() {
+            document.getElementById('expenseModal').classList.add('show');
+            document.getElementById('expenseName').value = '';
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('show');
+        }
+
+        function addExpense() {
+            const name = document.getElementById('expenseName').value;
+            
+            if (name) {
+                const monthData = window.appData.months[getMonthKey()];
+                monthData.expenses.push({ name, subitems: [], isDefault: false });
+                closeExpenseModal();
+                window.saveData();
+                window.updateDisplay();
+            }
+        }
+
+        function deleteExpense(idx) {
+            if (confirm('Are you sure you want to delete this expense category?')) {
+                const monthData = window.appData.months[getMonthKey()];
+                monthData.expenses.splice(idx, 1);
+                window.saveData();
+                window.updateDisplay();
+            }
+        }
+
+        function openSubitemModal(expenseIdx) {
+            currentExpenseId = expenseIdx;
+            document.getElementById('subitemModal').classList.add('show');
+            document.getElementById('subitemName').value = '';
+            document.getElementById('subitemAmount').value = '';
+        }
+
+        function closeSubitemModal() {
+            document.getElementById('subitemModal').classList.remove('show');
+            currentExpenseId = null;
+        }
+
+        function addSubitem() {
+            const name = document.getElementById('subitemName').value;
+            const amount = parseFloat(document.getElementById('subitemAmount').value);
+            
+            if (name && amount > 0 && currentExpenseId !== null) {
+                const monthData = window.appData.months[getMonthKey()];
+                monthData.expenses[currentExpenseId].subitems.push({ name, amount });
+                closeSubitemModal();
+                window.saveData();
+                window.updateDisplay();
+            }
+        }
+
+        function deleteSubitem(expenseIdx, subitemIdx) {
+            const monthData = window.appData.months[getMonthKey()];
+            monthData.expenses[expenseIdx].subitems.splice(subitemIdx, 1);
+            window.saveData();
+            window.updateDisplay();
+        }
+
+        document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
+        document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
+        document.getElementById('editPiggyBtn').addEventListener('click', editPiggyBank);
+        document.getElementById('addSavingsBtn').addEventListener('click', showConfirmSavingsModal);
+        document.getElementById('confirmSavingsBtn').addEventListener('click', addToPiggyBank);
+        document.getElementById('cancelSavingsBtn').addEventListener('click', closeConfirmSavingsModal);
+        document.getElementById('addIncomeBtn').addEventListener('click', openIncomeModal);
+        document.getElementById('addExpenseBtn').addEventListener('click', openExpenseModal);
+        document.getElementById('cancelIncomeBtn').addEventListener('click', closeIncomeModal);
+        document.getElementById('saveIncomeBtn').addEventListener('click', saveIncome);
+        document.getElementById('cancelExpenseBtn').addEventListener('click', closeExpenseModal);
+        document.getElementById('saveExpenseBtn').addEventListener('click', addExpense);
+        document.getElementById('cancelSubitemBtn').addEventListener('click', closeSubitemModal);
+        document.getElementById('saveSubitemBtn').addEventListener('click', addSubitem);
+        document.getElementById('cancelPiggyBtn').addEventListener('click', closePiggyBankModal);
+        document.getElementById('savePiggyBtn').addEventListener('click', savePiggyBank);
+    </script>
+</body>
+</html>
