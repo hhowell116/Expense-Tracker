@@ -330,17 +330,52 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #38ef7d;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 5px solid #38ef7d;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .income-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
 
         .income-item-content {
             flex: 1;
             min-width: 150px;
+        }
+
+        .income-item-content strong {
+            font-size: 18px;
+            color: #2d3436;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .income-item-content .income-subtitle {
+            font-size: 13px;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .income-amount-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .income-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00b894;
         }
 
         .expense-item {
@@ -910,8 +945,9 @@
                         await setDoc(partnerDocRef, partnerData);
                     }
 
-                    // Save preference to remember this shared tracker
+                    // Save BOTH preferences: current tracker and shared tracker
                     localStorage.setItem(`trackerId_${currentUser.email}`, partnerEmail);
+                    localStorage.setItem(`sharedTrackerId_${currentUser.email}`, partnerEmail);
 
                     // Switch to partner's tracker
                     trackerId = partnerEmail;
@@ -968,10 +1004,18 @@
 
         document.getElementById('switchToSharedBtn').addEventListener('click', () => {
             if (currentUser) {
-                const savedTrackerId = localStorage.getItem(`trackerId_${currentUser.email}`);
-                if (savedTrackerId && savedTrackerId !== currentUser.email) {
-                    // Already using shared tracker
-                    alert('You are currently viewing the shared tracker!');
+                const sharedTrackerId = localStorage.getItem(`sharedTrackerId_${currentUser.email}`);
+                const currentTrackerId = localStorage.getItem(`trackerId_${currentUser.email}`);
+                
+                if (sharedTrackerId && sharedTrackerId !== currentUser.email) {
+                    if (currentTrackerId === sharedTrackerId) {
+                        alert('You are already viewing the shared tracker!');
+                    } else {
+                        // Switch to shared tracker
+                        localStorage.setItem(`trackerId_${currentUser.email}`, sharedTrackerId);
+                        document.getElementById('userMenu').classList.remove('show');
+                        location.reload();
+                    }
                 } else {
                     alert('You don\'t have a shared tracker yet. Use "Share Tracker" to connect with a partner.');
                 }
