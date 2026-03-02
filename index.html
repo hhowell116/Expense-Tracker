@@ -192,6 +192,121 @@
         .edit-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4); }
         .delete-btn { background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%); }
         .delete-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4); }
+
+        /* Bill Checklist Styles */
+        .bill-checklist-wrapper {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .bill-checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .bill-checklist-header:hover {
+            background: var(--hover-bg);
+        }
+        .bill-checklist-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bill-checklist-header-left span {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        .bill-checklist-progress {
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--hover-bg);
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+        .bill-checklist-arrow {
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+        .bill-checklist-wrapper.open .bill-checklist-arrow {
+            transform: rotate(180deg);
+        }
+        .bill-checklist-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+        .bill-checklist-wrapper.open .bill-checklist-body {
+            max-height: 500px;
+        }
+        .bill-checklist-items {
+            padding: 0 22px 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bill-check-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: var(--hover-bg);
+            border-radius: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .bill-check-item:hover {
+            background: var(--input-bg);
+        }
+        .bill-check-item.checked {
+            opacity: 0.6;
+        }
+        .bill-check-item.checked .bill-check-label {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+        .bill-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: transparent;
+        }
+        .bill-check-item.checked .bill-checkbox {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-color: var(--accent-primary);
+        }
+        .bill-checkbox-tick {
+            display: none;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .bill-check-item.checked .bill-checkbox-tick {
+            display: block;
+        }
+        .bill-check-label {
+            font-size: 16px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .bill-check-icon {
+            font-size: 18px;
+        }
+
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px;
@@ -301,6 +416,20 @@
             <div class="card spent"><div class="card-label">Spent</div><div class="card-amount" id="totalSpent">$0</div></div>
             <div class="card saved"><div class="card-label">Saved</div><div class="card-amount" id="totalSaved">$0</div></div>
             <div class="card action" id="addSavingsBtn"><div class="card-label">💰 Add Savings to Piggy Bank</div></div>
+        </div>
+
+        <!-- Bill Checklist -->
+        <div class="bill-checklist-wrapper" id="billChecklistWrapper">
+            <div class="bill-checklist-header" id="billChecklistToggle">
+                <div class="bill-checklist-header-left">
+                    <span>📋 Bill Checklist</span>
+                    <span class="bill-checklist-progress" id="billProgress">0 / 5 paid</span>
+                </div>
+                <span class="bill-checklist-arrow">▼</span>
+            </div>
+            <div class="bill-checklist-body">
+                <div class="bill-checklist-items" id="billChecklistItems"></div>
+            </div>
         </div>
 
         <div class="section">
@@ -567,6 +696,13 @@
         let editingIncomeIdx = null;
         let incomeChart = null;
         const DEFAULT_EXPENSES = ['Bills', 'Groceries', 'Food/Drinks', 'Shopping'];
+        const DEFAULT_BILLS = [
+    { name: 'Rent', icon: '' },
+    { name: 'Electricity', icon: '' },
+    { name: 'Water', icon: '' },
+    { name: 'Gas', icon: '' },
+    { name: 'WiFi', icon: '' }
+];
 
         window.appData = { incomes: [], months: {}, piggyBank: 0, sharedWith: [], defaultExpensesInitialized: false };
 
@@ -582,18 +718,68 @@
         function initMonth() {
             const key = getMonthKey();
             if (!window.appData.months[key]) {
-                window.appData.months[key] = { expenses: [], addedToPiggyBank: false };
+                window.appData.months[key] = { expenses: [], addedToPiggyBank: false, billChecklist: {} };
                 DEFAULT_EXPENSES.forEach(category => {
                     window.appData.months[key].expenses.push({ name: category, subitems: [], isDefault: true });
                 });
+                DEFAULT_BILLS.forEach(bill => {
+                    window.appData.months[key].billChecklist[bill.name] = false;
+                });
                 window.saveData();
             } else {
+                // Ensure billChecklist exists for older months
+                if (!window.appData.months[key].billChecklist) {
+                    window.appData.months[key].billChecklist = {};
+                }
+                DEFAULT_BILLS.forEach(bill => {
+                    if (window.appData.months[key].billChecklist[bill.name] === undefined) {
+                        window.appData.months[key].billChecklist[bill.name] = false;
+                    }
+                });
                 DEFAULT_EXPENSES.forEach(category => {
                     const exists = window.appData.months[key].expenses.some(exp => exp.name === category);
                     if (!exists) window.appData.months[key].expenses.unshift({ name: category, subitems: [], isDefault: true });
                 });
             }
         }
+
+        function renderBillChecklist() {
+            const key = getMonthKey();
+            const monthData = window.appData.months[key];
+            if (!monthData || !monthData.billChecklist) return;
+
+            const container = document.getElementById('billChecklistItems');
+            const checkedCount = DEFAULT_BILLS.filter(b => monthData.billChecklist[b.name]).length;
+
+            document.getElementById('billProgress').textContent = `${checkedCount} / ${DEFAULT_BILLS.length} paid`;
+
+            container.innerHTML = DEFAULT_BILLS.map(bill => {
+                const checked = monthData.billChecklist[bill.name];
+                return `
+                    <div class="bill-check-item ${checked ? 'checked' : ''}" data-bill="${bill.name}">
+                        <div class="bill-checkbox">
+                            <span class="bill-checkbox-tick">✓</span>
+                        </div>
+                        <span class="bill-check-icon">${bill.icon}</span>
+                        <span class="bill-check-label">${bill.name}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.bill-check-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const billName = this.getAttribute('data-bill');
+                    monthData.billChecklist[billName] = !monthData.billChecklist[billName];
+                    window.saveData();
+                    renderBillChecklist();
+                });
+            });
+        }
+
+        // Toggle bill checklist dropdown
+        document.getElementById('billChecklistToggle').addEventListener('click', () => {
+            document.getElementById('billChecklistWrapper').classList.toggle('open');
+        });
 
         window.updateDisplay = function() {
             const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -610,6 +796,9 @@
             document.getElementById('totalSpent').textContent = `${totalSpent.toFixed(2)}`;
             document.getElementById('totalSaved').textContent = `${saved.toFixed(2)}`;
             document.getElementById('piggyBank').textContent = `${window.appData.piggyBank.toFixed(2)}`;
+
+            // Render bill checklist
+            renderBillChecklist();
 
             const incomeList = document.getElementById('incomeList');
             incomeList.innerHTML = window.appData.incomes.map((inc, idx) => `
@@ -652,7 +841,6 @@
                 const percentage = totalIncome > 0 ? (total / totalIncome) * 100 : 0;
                 const itemCount = exp.subitems.length;
 
-                // Sort subitems by date, most recent first
                 const sortedSubitems = [...exp.subitems].map((sub, origIdx) => ({...sub, origIdx}));
                 sortedSubitems.sort((a, b) => {
                     const dateA = a.date ? new Date(a.date).getTime() : 0;
@@ -830,9 +1018,7 @@
             if (name && amount > 0 && currentExpenseId !== null) {
                 const monthData = window.appData.months[getMonthKey()];
                 monthData.expenses[currentExpenseId].subitems.push({
-                    name,
-                    amount,
-                    date: new Date().toISOString()
+                    name, amount, date: new Date().toISOString()
                 });
                 closeSubitemModal(); window.saveData(); window.updateDisplay();
             }
