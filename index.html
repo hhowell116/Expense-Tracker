@@ -193,119 +193,92 @@
         .delete-btn { background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%); }
         .delete-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4); }
 
-        /* Bill Checklist Styles */
-        .bill-checklist-wrapper {
+        /* Checklist Styles */
+        .checklist-wrapper {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 15px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
             overflow: hidden;
             transition: all 0.3s;
         }
-        .bill-checklist-header {
+        .checklist-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 22px;
+            padding: 12px 16px;
             cursor: pointer;
             transition: background 0.2s;
             user-select: none;
         }
-        .bill-checklist-header:hover {
-            background: var(--hover-bg);
+        .checklist-header:hover { background: var(--hover-bg); }
+        .checklist-header-left {
+            display: flex; align-items: center; gap: 8px;
         }
-        .bill-checklist-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .checklist-header-left span.checklist-title {
+            font-size: 14px; font-weight: bold; color: var(--text-primary);
         }
-        .bill-checklist-header-left span {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-primary);
+        .checklist-progress {
+            font-size: 11px; color: var(--text-secondary);
+            background: var(--hover-bg); padding: 2px 8px; border-radius: 8px;
         }
-        .bill-checklist-progress {
-            font-size: 13px;
-            color: var(--text-secondary);
-            background: var(--hover-bg);
-            padding: 4px 10px;
-            border-radius: 10px;
+        .checklist-arrow {
+            font-size: 13px; color: var(--text-secondary); transition: transform 0.3s;
         }
-        .bill-checklist-arrow {
-            font-size: 18px;
-            color: var(--text-secondary);
-            transition: transform 0.3s;
+        .checklist-wrapper.open .checklist-arrow { transform: rotate(180deg); }
+        .checklist-body {
+            max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
         }
-        .bill-checklist-wrapper.open .bill-checklist-arrow {
-            transform: rotate(180deg);
+        .checklist-wrapper.open .checklist-body { max-height: 800px; }
+        .checklist-items {
+            padding: 0 16px 12px 16px;
+            display: flex; flex-direction: column; gap: 6px;
         }
-        .bill-checklist-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease;
+        .checklist-add-row {
+            display: flex; gap: 8px; padding: 0 16px 12px 16px;
         }
-        .bill-checklist-wrapper.open .bill-checklist-body {
-            max-height: 500px;
+        .checklist-add-input {
+            flex: 1; padding: 7px 10px; border: 1px solid var(--input-border);
+            border-radius: 6px; font-size: 12px; background: var(--input-bg);
+            color: var(--text-primary); outline: none;
         }
-        .bill-checklist-items {
-            padding: 0 22px 18px 22px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .checklist-add-input:focus { border-color: var(--accent-primary); }
+        .checklist-add-btn {
+            background: var(--accent-primary); color: white; border: none;
+            padding: 7px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 12px; font-weight: 600; transition: all 0.2s;
         }
-        .bill-check-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            background: var(--hover-bg);
-            border-radius: 10px;
-            transition: all 0.2s;
-            cursor: pointer;
+        .checklist-add-btn:hover { background: var(--accent-secondary); }
+        .check-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; background: var(--hover-bg);
+            border-radius: 7px; transition: all 0.2s; cursor: pointer;
         }
-        .bill-check-item:hover {
-            background: var(--input-bg);
+        .check-item:hover { background: var(--input-bg); }
+        .check-item.checked { opacity: 0.55; }
+        .check-item.checked .check-label {
+            text-decoration: line-through; color: var(--text-secondary);
         }
-        .bill-check-item.checked {
-            opacity: 0.6;
-        }
-        .bill-check-item.checked .bill-check-label {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
-        .bill-checkbox {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+        .checkbox-box {
+            width: 18px; height: 18px; border-radius: 4px;
             border: 2px solid var(--accent-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s;
-            background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s; background: transparent;
+            font-size: 10px; color: white;
         }
-        .bill-check-item.checked .bill-checkbox {
+        .check-item.checked .checkbox-box {
             background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-            border-color: var(--accent-primary);
         }
-        .bill-checkbox-tick {
-            display: none;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
+        .checkbox-tick { display: none; }
+        .check-item.checked .checkbox-tick { display: block; }
+        .check-label { font-size: 13px; color: var(--text-primary); transition: all 0.2s; flex: 1; }
+        .check-delete {
+            background: none; border: none; color: var(--text-secondary);
+            cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px;
+            transition: all 0.2s; opacity: 0; line-height: 1;
         }
-        .bill-check-item.checked .bill-checkbox-tick {
-            display: block;
-        }
-        .bill-check-label {
-            font-size: 16px;
-            color: var(--text-primary);
-            transition: all 0.2s;
-        }
-        .bill-check-icon {
-            font-size: 18px;
-        }
+        .check-item:hover .check-delete { opacity: 1; }
+        .check-delete:hover { color: #ff4757; background: rgba(255,71,87,0.1); }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -365,7 +338,7 @@
 </head>
 <body>
     <div id="loginContainer" class="login-container">
-        <h1>💰 Expense Tracker</h1>
+        <h1>Expense Tracker</h1>
         <p style="color: var(--text-secondary); margin-bottom: 30px;">Track your monthly expenses with your partner</p>
         <button class="google-btn" id="googleSignInBtn">
             <svg class="google-icon" viewBox="0 0 24 24">
@@ -385,29 +358,29 @@
                 <img id="userAvatar" class="user-avatar" src="" alt="User">
                 <div class="user-menu" id="userMenu">
                     <div class="menu-item"><span id="userName">User</span></div>
-                    <div class="menu-item" id="themeToggle">🌙 Toggle Light Mode</div>
-                    <div class="menu-item" id="shareBtn">👥 Share Tracker</div>
-                    <div class="menu-item" id="switchToOwnBtn">📊 Use My Own Tracker</div>
-                    <div class="menu-item" id="switchToSharedBtn">🤝 Use Shared Tracker</div>
-                    <div class="menu-item logout" id="signOutBtn">🚪 Sign Out</div>
+                    <div class="menu-item" id="themeToggle">Toggle Light Mode</div>
+                    <div class="menu-item" id="shareBtn">Share Tracker</div>
+                    <div class="menu-item" id="switchToOwnBtn">Use My Own Tracker</div>
+                    <div class="menu-item" id="switchToSharedBtn">Use Shared Tracker</div>
+                    <div class="menu-item logout" id="signOutBtn">Sign Out</div>
                 </div>
             </div>
             <h1>Expense Tracker</h1>
             <div class="month-nav">
-                <button id="prevMonthBtn">←</button>
+                <button id="prevMonthBtn">&larr;</button>
                 <div class="month-display" id="monthDisplay">Loading...</div>
-                <button id="nextMonthBtn">→</button>
+                <button id="nextMonthBtn">&rarr;</button>
             </div>
         </div>
 
         <div id="shareInfo" class="share-info hidden">
-            <strong>📧 Share this tracker ID with your partner:</strong>
+            <strong>Share this tracker ID with your partner:</strong>
             <div id="trackerIdDisplay" style="font-family: monospace; font-size: 16px; margin-top: 5px;"></div>
         </div>
 
         <div class="piggy-bank">
             <button class="piggy-edit-btn" id="editPiggyBtn">Edit</button>
-            <div class="label">🐷 Piggy Bank</div>
+            <div class="label">Piggy Bank</div>
             <div class="amount" id="piggyBank">$0.00</div>
         </div>
 
@@ -415,26 +388,48 @@
             <div class="card income"><div class="card-label">Total Income</div><div class="card-amount" id="totalIncome">$0</div></div>
             <div class="card spent"><div class="card-label">Spent</div><div class="card-amount" id="totalSpent">$0</div></div>
             <div class="card saved"><div class="card-label">Saved</div><div class="card-amount" id="totalSaved">$0</div></div>
-            <div class="card action" id="addSavingsBtn"><div class="card-label">💰 Add Savings to Piggy Bank</div></div>
+            <div class="card action" id="addSavingsBtn"><div class="card-label">Add Savings to Piggy Bank</div></div>
         </div>
 
         <!-- Bill Checklist -->
-        <div class="bill-checklist-wrapper" id="billChecklistWrapper">
-            <div class="bill-checklist-header" id="billChecklistToggle">
-                <div class="bill-checklist-header-left">
-                    <span>📋 Bill Checklist</span>
-                    <span class="bill-checklist-progress" id="billProgress">0 / 5 paid</span>
+        <div class="checklist-wrapper" id="billChecklistWrapper">
+            <div class="checklist-header" id="billChecklistToggle">
+                <div class="checklist-header-left">
+                    <span class="checklist-title">Bill Checklist</span>
+                    <span class="checklist-progress" id="billProgress">0 / 0 paid</span>
                 </div>
-                <span class="bill-checklist-arrow">▼</span>
+                <span class="checklist-arrow">&#9660;</span>
             </div>
-            <div class="bill-checklist-body">
-                <div class="bill-checklist-items" id="billChecklistItems"></div>
+            <div class="checklist-body">
+                <div class="checklist-add-row">
+                    <input type="text" class="checklist-add-input" id="billAddInput" placeholder="Add a bill...">
+                    <button class="checklist-add-btn" id="billAddBtn">Add</button>
+                </div>
+                <div class="checklist-items" id="billChecklistItems"></div>
+            </div>
+        </div>
+
+        <!-- To-Buy Checklist -->
+        <div class="checklist-wrapper" id="toBuyChecklistWrapper">
+            <div class="checklist-header" id="toBuyChecklistToggle">
+                <div class="checklist-header-left">
+                    <span class="checklist-title">To-Buy Checklist</span>
+                    <span class="checklist-progress" id="toBuyProgress">0 / 0 bought</span>
+                </div>
+                <span class="checklist-arrow">&#9660;</span>
+            </div>
+            <div class="checklist-body">
+                <div class="checklist-add-row">
+                    <input type="text" class="checklist-add-input" id="toBuyAddInput" placeholder="Add an item...">
+                    <button class="checklist-add-btn" id="toBuyAddBtn">Add</button>
+                </div>
+                <div class="checklist-items" id="toBuyChecklistItems"></div>
             </div>
         </div>
 
         <div class="section">
             <div class="section-title">
-                <span>💵 Income Sources</span>
+                <span>Income Sources</span>
                 <button class="add-btn" id="addIncomeBtn">+ Add Income</button>
             </div>
             <div class="income-container">
@@ -450,7 +445,7 @@
 
         <div class="section">
             <div class="section-title">
-                <span>💳 Expenses</span>
+                <span>Expenses</span>
                 <button class="add-btn" id="addExpenseBtn">+ Add Expense</button>
             </div>
             <div class="expense-list" id="expenseList"></div>
@@ -650,13 +645,13 @@
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            document.getElementById('themeToggle').textContent = isLight ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
+            document.getElementById('themeToggle').textContent = isLight ? 'Toggle Dark Mode' : 'Toggle Light Mode';
             document.getElementById('userMenu').classList.remove('show');
             if (window.updateDisplay) window.updateDisplay();
         });
 
         document.getElementById('themeToggle').textContent =
-            document.body.classList.contains('light-mode') ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
+            document.body.classList.contains('light-mode') ? 'Toggle Dark Mode' : 'Toggle Light Mode';
 
         document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
         document.getElementById('signOutBtn').addEventListener('click', signOutUser);
@@ -696,13 +691,6 @@
         let editingIncomeIdx = null;
         let incomeChart = null;
         const DEFAULT_EXPENSES = ['Bills', 'Groceries', 'Food/Drinks', 'Shopping'];
-        const DEFAULT_BILLS = [
-    { name: 'Rent', icon: '' },
-    { name: 'Electricity', icon: '' },
-    { name: 'Water', icon: '' },
-    { name: 'Gas', icon: '' },
-    { name: 'WiFi', icon: '' }
-];
 
         window.appData = { incomes: [], months: {}, piggyBank: 0, sharedWith: [], defaultExpensesInitialized: false };
 
@@ -718,67 +706,110 @@
         function initMonth() {
             const key = getMonthKey();
             if (!window.appData.months[key]) {
-                window.appData.months[key] = { expenses: [], addedToPiggyBank: false, billChecklist: {} };
+                window.appData.months[key] = {
+                    expenses: [],
+                    addedToPiggyBank: false,
+                    billChecklist: [],
+                    toBuyChecklist: []
+                };
                 DEFAULT_EXPENSES.forEach(category => {
                     window.appData.months[key].expenses.push({ name: category, subitems: [], isDefault: true });
                 });
-                DEFAULT_BILLS.forEach(bill => {
-                    window.appData.months[key].billChecklist[bill.name] = false;
-                });
                 window.saveData();
             } else {
-                // Ensure billChecklist exists for older months
-                if (!window.appData.months[key].billChecklist) {
-                    window.appData.months[key].billChecklist = {};
-                }
-                DEFAULT_BILLS.forEach(bill => {
-                    if (window.appData.months[key].billChecklist[bill.name] === undefined) {
-                        window.appData.months[key].billChecklist[bill.name] = false;
+                const m = window.appData.months[key];
+                if (!m.billChecklist) m.billChecklist = [];
+                if (!m.toBuyChecklist) m.toBuyChecklist = [];
+                // Convert old object-based billChecklist to array format
+                if (m.billChecklist && !Array.isArray(m.billChecklist)) {
+                    const arr = [];
+                    for (const [name, checked] of Object.entries(m.billChecklist)) {
+                        arr.push({ name, checked });
                     }
-                });
+                    m.billChecklist = arr;
+                }
                 DEFAULT_EXPENSES.forEach(category => {
-                    const exists = window.appData.months[key].expenses.some(exp => exp.name === category);
-                    if (!exists) window.appData.months[key].expenses.unshift({ name: category, subitems: [], isDefault: true });
+                    const exists = m.expenses.some(exp => exp.name === category);
+                    if (!exists) m.expenses.unshift({ name: category, subitems: [], isDefault: true });
                 });
             }
         }
 
-        function renderBillChecklist() {
+        // Generic checklist renderer
+        function renderChecklist(listKey, containerId, progressId, doneWord) {
             const key = getMonthKey();
             const monthData = window.appData.months[key];
-            if (!monthData || !monthData.billChecklist) return;
+            if (!monthData) return;
+            const items = monthData[listKey] || [];
+            const checkedCount = items.filter(i => i.checked).length;
+            document.getElementById(progressId).textContent = `${checkedCount} / ${items.length} ${doneWord}`;
 
-            const container = document.getElementById('billChecklistItems');
-            const checkedCount = DEFAULT_BILLS.filter(b => monthData.billChecklist[b.name]).length;
+            const container = document.getElementById(containerId);
+            container.innerHTML = items.map((item, idx) => `
+                <div class="check-item ${item.checked ? 'checked' : ''}" data-list="${listKey}" data-idx="${idx}">
+                    <div class="checkbox-box"><span class="checkbox-tick">&#10003;</span></div>
+                    <span class="check-label">${item.name}</span>
+                    <button class="check-delete" data-list="${listKey}" data-delidx="${idx}">&times;</button>
+                </div>
+            `).join('');
 
-            document.getElementById('billProgress').textContent = `${checkedCount} / ${DEFAULT_BILLS.length} paid`;
-
-            container.innerHTML = DEFAULT_BILLS.map(bill => {
-                const checked = monthData.billChecklist[bill.name];
-                return `
-                    <div class="bill-check-item ${checked ? 'checked' : ''}" data-bill="${bill.name}">
-                        <div class="bill-checkbox">
-                            <span class="bill-checkbox-tick">✓</span>
-                        </div>
-                        <span class="bill-check-icon">${bill.icon}</span>
-                        <span class="bill-check-label">${bill.name}</span>
-                    </div>
-                `;
-            }).join('');
-
-            container.querySelectorAll('.bill-check-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const billName = this.getAttribute('data-bill');
-                    monthData.billChecklist[billName] = !monthData.billChecklist[billName];
+            container.querySelectorAll('.check-item').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.closest('.check-delete')) return;
+                    const lk = this.getAttribute('data-list');
+                    const i = parseInt(this.getAttribute('data-idx'));
+                    monthData[lk][i].checked = !monthData[lk][i].checked;
                     window.saveData();
-                    renderBillChecklist();
+                    renderChecklist(listKey, containerId, progressId, doneWord);
+                });
+            });
+
+            container.querySelectorAll('.check-delete').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const lk = this.getAttribute('data-list');
+                    const i = parseInt(this.getAttribute('data-delidx'));
+                    monthData[lk].splice(i, 1);
+                    window.saveData();
+                    renderChecklist(listKey, containerId, progressId, doneWord);
                 });
             });
         }
 
-        // Toggle bill checklist dropdown
+        function addChecklistItem(listKey, inputId, containerId, progressId, doneWord) {
+            const input = document.getElementById(inputId);
+            const name = input.value.trim();
+            if (!name) return;
+            const key = getMonthKey();
+            const monthData = window.appData.months[key];
+            monthData[listKey].push({ name, checked: false });
+            input.value = '';
+            window.saveData();
+            renderChecklist(listKey, containerId, progressId, doneWord);
+        }
+
+        // Toggle dropdowns
         document.getElementById('billChecklistToggle').addEventListener('click', () => {
             document.getElementById('billChecklistWrapper').classList.toggle('open');
+        });
+        document.getElementById('toBuyChecklistToggle').addEventListener('click', () => {
+            document.getElementById('toBuyChecklistWrapper').classList.toggle('open');
+        });
+
+        // Add bill
+        document.getElementById('billAddBtn').addEventListener('click', () => {
+            addChecklistItem('billChecklist', 'billAddInput', 'billChecklistItems', 'billProgress', 'paid');
+        });
+        document.getElementById('billAddInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addChecklistItem('billChecklist', 'billAddInput', 'billChecklistItems', 'billProgress', 'paid');
+        });
+
+        // Add to-buy
+        document.getElementById('toBuyAddBtn').addEventListener('click', () => {
+            addChecklistItem('toBuyChecklist', 'toBuyAddInput', 'toBuyChecklistItems', 'toBuyProgress', 'bought');
+        });
+        document.getElementById('toBuyAddInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addChecklistItem('toBuyChecklist', 'toBuyAddInput', 'toBuyChecklistItems', 'toBuyProgress', 'bought');
         });
 
         window.updateDisplay = function() {
@@ -797,8 +828,9 @@
             document.getElementById('totalSaved').textContent = `${saved.toFixed(2)}`;
             document.getElementById('piggyBank').textContent = `${window.appData.piggyBank.toFixed(2)}`;
 
-            // Render bill checklist
-            renderBillChecklist();
+            // Render checklists
+            renderChecklist('billChecklist', 'billChecklistItems', 'billProgress', 'paid');
+            renderChecklist('toBuyChecklist', 'toBuyChecklistItems', 'toBuyProgress', 'bought');
 
             const incomeList = document.getElementById('incomeList');
             incomeList.innerHTML = window.appData.incomes.map((inc, idx) => `
@@ -807,7 +839,7 @@
                         <div class="income-item-content"><strong>${inc.name}</strong></div>
                         <div class="income-amount-section">
                             <span class="income-amount">${inc.amount.toFixed(2)}</span>
-                            <span class="income-toggle-icon">▼</span>
+                            <span class="income-toggle-icon">&#9660;</span>
                         </div>
                     </div>
                     <div class="income-item-details">
