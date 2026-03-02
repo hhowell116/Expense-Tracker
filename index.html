@@ -7,866 +7,248 @@
     <title>Monthly Expense Tracker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-gradient-start: #1a1a2e;
-            --bg-gradient-end: #16213e;
-            --container-bg: #0f1419;
-            --card-bg: #1a1f2e;
-            --text-primary: #e4e6eb;
-            --text-secondary: #b0b3b8;
-            --accent-primary: #667eea;
-            --accent-secondary: #764ba2;
-            --border-color: #2d3748;
-            --hover-bg: #252d3d;
-            --modal-bg: #1a1f2e;
-            --input-bg: #252d3d;
-            --input-border: #3d4556;
+            --bg-gradient-start: #1a1a2e; --bg-gradient-end: #16213e;
+            --container-bg: #0f1419; --card-bg: #1a1f2e;
+            --text-primary: #e4e6eb; --text-secondary: #b0b3b8;
+            --accent-primary: #667eea; --accent-secondary: #764ba2;
+            --border-color: #2d3748; --hover-bg: #252d3d;
+            --modal-bg: #1a1f2e; --input-bg: #252d3d; --input-border: #3d4556;
         }
-
         body.light-mode {
-            --bg-gradient-start: #667eea;
-            --bg-gradient-end: #764ba2;
-            --container-bg: #ffffff;
-            --card-bg: #f8f9fa;
-            --text-primary: #2d3436;
-            --text-secondary: #636e72;
-            --accent-primary: #667eea;
-            --accent-secondary: #764ba2;
-            --border-color: #e0e0e0;
-            --hover-bg: #f0f0f0;
-            --modal-bg: #ffffff;
-            --input-bg: #ffffff;
-            --input-border: #e0e0e0;
+            --bg-gradient-start: #667eea; --bg-gradient-end: #764ba2;
+            --container-bg: #ffffff; --card-bg: #f8f9fa;
+            --text-primary: #2d3436; --text-secondary: #636e72;
+            --accent-primary: #667eea; --accent-secondary: #764ba2;
+            --border-color: #e0e0e0; --hover-bg: #f0f0f0;
+            --modal-bg: #ffffff; --input-bg: #ffffff; --input-border: #e0e0e0;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-            min-height: 100vh;
-            padding: 20px;
-            transition: all 0.3s ease;
+            min-height: 100vh; padding: 20px; transition: all 0.3s ease;
         }
-
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--container-bg);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px; margin: 0 auto; background: var(--container-bg);
+            border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
-
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            background: var(--container-bg);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px; margin: 100px auto; background: var(--container-bg);
+            border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
         }
-
-        .login-container h1 {
-            color: var(--accent-primary);
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
+        .login-container h1 { color: var(--accent-primary); margin-bottom: 30px; font-size: 28px; }
         .google-btn {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            justify-content: center;
-            transition: all 0.3s;
-            width: 100%;
-            color: var(--text-primary);
+            background: var(--card-bg); border: 2px solid var(--border-color);
+            padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; gap: 10px; justify-content: center;
+            transition: all 0.3s; width: 100%; color: var(--text-primary);
         }
-
-        .google-btn:hover {
-            border-color: var(--accent-primary);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-
-        .google-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .header {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .header h1 {
-            color: var(--accent-primary);
-            font-size: 24px;
-            text-align: center;
-        }
-
-        .user-info {
-            position: absolute;
-            top: 0;
-            right: 0;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
+        .google-btn:hover { border-color: var(--accent-primary); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); }
+        .google-icon { width: 20px; height: 20px; }
+        .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; position: relative; }
+        .header h1 { color: var(--accent-primary); font-size: 24px; text-align: center; }
+        .user-info { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 5px; }
         .hamburger-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            cursor: pointer;
-            padding: 4px;
-            transition: all 0.3s;
+            width: 24px; height: 24px; display: flex; flex-direction: column;
+            justify-content: space-around; cursor: pointer; padding: 4px; transition: all 0.3s;
         }
-
-        .hamburger-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .hamburger-icon span {
-            width: 100%;
-            height: 3px;
-            background: var(--accent-primary);
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
-
+        .hamburger-icon:hover { transform: scale(1.1); }
+        .hamburger-icon span { width: 100%; height: 3px; background: var(--accent-primary); border-radius: 2px; transition: all 0.3s; }
         .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-primary);
-            cursor: pointer;
-            transition: all 0.3s;
+            width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--accent-primary);
+            cursor: pointer; transition: all 0.3s;
         }
-
-        .user-avatar:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
-        }
-
+        .user-avatar:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5); }
         .user-menu {
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background: var(--modal-bg);
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-            padding: 10px;
-            min-width: 200px;
-            display: none;
-            z-index: 1000;
-            border: 1px solid var(--border-color);
+            position: absolute; top: 45px; right: 0; background: var(--modal-bg);
+            border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); padding: 10px;
+            min-width: 200px; display: none; z-index: 1000; border: 1px solid var(--border-color);
         }
-
-        .user-menu.show {
-            display: block;
-        }
-
+        .user-menu.show { display: block; }
         .menu-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
+            padding: 12px 15px; cursor: pointer; border-radius: 6px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 10px; color: var(--text-primary); font-size: 14px;
         }
-
-        .menu-item:hover {
-            background: var(--hover-bg);
-        }
-
-        .menu-item.logout {
-            color: #ff4757;
-            border-top: 1px solid var(--border-color);
-            margin-top: 5px;
-        }
-
-        .month-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
+        .menu-item:hover { background: var(--hover-bg); }
+        .menu-item.logout { color: #ff4757; border-top: 1px solid var(--border-color); margin-top: 5px; }
+        .month-nav { display: flex; align-items: center; justify-content: center; gap: 15px; }
         .month-nav button {
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-            flex-shrink: 0;
+            background: var(--accent-primary); color: white; border: none; width: 40px; height: 40px;
+            border-radius: 50%; cursor: pointer; font-size: 20px; transition: all 0.3s; flex-shrink: 0;
         }
-
-        .month-nav button:hover {
-            background: var(--accent-secondary);
-            transform: scale(1.1);
-        }
-
-        .month-display {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text-primary);
-            text-align: center;
-            min-width: 150px;
-        }
-
+        .month-nav button:hover { background: var(--accent-secondary); transform: scale(1.1); }
+        .month-display { font-size: 20px; font-weight: bold; color: var(--text-primary); text-align: center; min-width: 150px; }
         .piggy-bank {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            margin-bottom: 20px;
-            position: relative;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px;
+            border-radius: 15px; text-align: center; color: white; margin-bottom: 20px; position: relative;
         }
-
         .piggy-edit-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 10;
+            position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.3);
+            border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; font-weight: bold; transition: all 0.3s; z-index: 10;
         }
-
-        .piggy-edit-btn:hover {
-            background: rgba(255, 255, 255, 0.5);
-            transform: scale(1.05);
-        }
-
-        .piggy-bank .label {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .piggy-bank .amount {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
+        .piggy-edit-btn:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.05); }
+        .piggy-bank .label { font-size: 16px; opacity: 0.9; margin-bottom: 5px; }
+        .piggy-bank .amount { font-size: 36px; font-weight: bold; }
+        .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
         .card {
-            padding: 15px;
-            border-radius: 15px;
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100px;
+            padding: 15px; border-radius: 15px; color: white; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100px;
         }
-
         .card.income { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
         .card.spent { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
         .card.saved { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
-        .card.action { 
+        .card.action {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            cursor: pointer;
-            transition: all 0.3s;
+            cursor: pointer; transition: all 0.3s;
         }
-
-        .card.action:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .card.action .card-label {
-            font-size: 14px;
-        }
-
-        .card-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .card-amount {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .section {
-            margin-bottom: 25px;
-        }
-
+        .card.action:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .card.action .card-label { font-size: 14px; }
+        .card-label { font-size: 12px; opacity: 0.9; margin-bottom: 5px; }
+        .card-amount { font-size: 24px; font-weight: bold; }
+        .section { margin-bottom: 25px; }
         .section-divider {
             height: 3px;
             background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-primary) 100%);
-            margin: 40px 0;
-            border-radius: 2px;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            margin: 40px 0; border-radius: 2px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
-
         .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
-
         .add-btn {
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
+            background: var(--accent-primary); color: white; border: none; padding: 8px 16px;
+            border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s;
         }
-
-        .add-btn:hover {
-            background: var(--accent-secondary);
-        }
-
-        .income-list, .expense-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .income-container {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .income-items-wrapper {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 12px;
-        }
-
+        .add-btn:hover { background: var(--accent-secondary); }
+        .income-list, .expense-list { display: flex; flex-direction: column; gap: 10px; }
+        .income-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
+        .income-items-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
         .income-item {
-            display: flex;
-            flex-direction: column;
-            padding: 18px 22px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 2px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            cursor: pointer;
-            min-height: 100px;
+            display: flex; flex-direction: column; padding: 18px 22px; background: var(--card-bg);
+            border-radius: 12px; border: 2px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s; cursor: pointer; min-height: 100px;
         }
-
-        .income-item:hover {
-            border-color: var(--accent-primary);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .income-item.expanded {
-            background: var(--hover-bg);
-            border-color: #00b894;
-        }
-
-        .income-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .income-item-content strong {
-            font-size: 17px;
-            color: var(--text-primary);
-            display: block;
-        }
-
-        .income-item-details {
-            display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid var(--border-color);
-            width: 100%;
-        }
-
-        .income-item.expanded .income-item-details {
-            display: block;
-        }
-
+        .income-item:hover { border-color: var(--accent-primary); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); transform: translateY(-2px); }
+        .income-item.expanded { background: var(--hover-bg); border-color: #00b894; }
+        .income-item-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .income-item-content strong { font-size: 17px; color: var(--text-primary); display: block; }
+        .income-item-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color); width: 100%; }
+        .income-item.expanded .income-item-details { display: block; }
         .income-chart-container {
-            width: 100%;
-            flex-shrink: 0;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            border: 2px solid var(--border-color);
+            width: 100%; flex-shrink: 0; background: var(--card-bg); padding: 25px;
+            border-radius: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); border: 2px solid var(--border-color);
         }
-
-        .income-chart-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        #incomeChart {
-            width: 100%;
-            height: 300px;
-        }
-
-        .income-amount-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .income-amount {
-            font-size: 22px;
-            font-weight: bold;
-            color: #00b894;
-        }
-
-        .income-toggle-icon {
-            font-size: 14px;
-            color: var(--text-secondary);
-            transition: transform 0.3s;
-        }
-
-        .income-item.expanded .income-toggle-icon {
-            transform: rotate(180deg);
-        }
-
+        .income-chart-title { font-size: 16px; font-weight: bold; color: var(--text-primary); margin-bottom: 20px; text-align: center; }
+        #incomeChart { width: 100%; height: 300px; }
+        .income-amount-section { display: flex; align-items: center; gap: 10px; }
+        .income-amount { font-size: 22px; font-weight: bold; color: #00b894; }
+        .income-toggle-icon { font-size: 14px; color: var(--text-secondary); transition: transform 0.3s; }
+        .income-item.expanded .income-toggle-icon { transform: rotate(180deg); }
         .expense-item {
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 2px solid var(--border-color);
-            cursor: pointer;
+            padding: 20px; background: var(--card-bg); border-radius: 12px; margin-bottom: 15px;
+            transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid var(--border-color); cursor: pointer;
         }
-
-        .expense-item:hover {
-            border-color: var(--accent-primary);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .expense-item.expanded {
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            border-color: var(--accent-primary);
-        }
-
+        .expense-item:hover { border-color: var(--accent-primary); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); transform: translateY(-2px); }
+        .expense-item.expanded { box-shadow: 0 6px 20px rgba(0,0,0,0.15); border-color: var(--accent-primary); }
         .expense-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
         }
-
-        .expense-header-left {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .expense-header-left strong {
-            font-size: 18px;
-            color: var(--text-primary);
-        }
-
-        .expense-item-count {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: none;
-        }
-
-        .expense-item.expanded .expense-item-count {
-            display: block;
-        }
-
-        .expense-amount-section {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-        }
-
-        .expense-total {
-            font-size: 22px;
-            font-weight: bold;
-            color: #d63031;
-        }
-
-        .expense-percentage {
-            font-size: 12px;
-            color: var(--text-secondary);
-            background: var(--hover-bg);
-            padding: 3px 8px;
-            border-radius: 10px;
-        }
-
+        .expense-header-left { display: flex; flex-direction: column; gap: 5px; }
+        .expense-header-left strong { font-size: 18px; color: var(--text-primary); }
+        .expense-item-count { font-size: 13px; color: var(--text-secondary); display: none; }
+        .expense-item.expanded .expense-item-count { display: block; }
+        .expense-amount-section { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .expense-total { font-size: 22px; font-weight: bold; color: #d63031; }
+        .expense-percentage { font-size: 12px; color: var(--text-secondary); background: var(--hover-bg); padding: 3px 8px; border-radius: 10px; }
         .expense-bar {
-            height: 10px;
-            background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-            border-radius: 5px;
-            margin: 12px 0;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+            height: 10px; background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-radius: 5px; margin: 12px 0; transition: all 0.3s; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
         }
-
-        .expense-subitems {
-            margin-top: 15px;
-            padding-left: 0;
-            display: none;
-            border-top: 2px solid var(--border-color);
-            padding-top: 15px;
-        }
-
-        .expense-subitems.show {
-            display: block;
-        }
-
-        .expense-actions {
-            display: none;
-            gap: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .expense-item.expanded .expense-actions {
-            display: flex;
-        }
-
+        .expense-subitems { margin-top: 15px; padding-left: 0; display: none; border-top: 2px solid var(--border-color); padding-top: 15px; }
+        .expense-subitems.show { display: block; }
+        .expense-actions { display: none; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color); }
+        .expense-item.expanded .expense-actions { display: flex; }
         .subitem {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 10px;
-            background: var(--hover-bg);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.2s;
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;
+            background: var(--hover-bg); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s;
         }
-
-        .subitem:hover {
-            background: var(--input-bg);
-        }
-
-        .subitem:last-child {
-            border-bottom: none;
-        }
-
-        .subitem-name {
-            font-size: 15px;
-            color: var(--text-primary);
-            flex: 1;
-        }
-
-        .subitem-amount {
-            font-size: 16px;
-            font-weight: 600;
-            color: #d63031;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .subitem:hover { background: var(--input-bg); }
+        .subitem:last-child { border-bottom: none; }
+        .subitem-left { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .subitem-name { font-size: 15px; color: var(--text-primary); }
+        .subitem-date { font-size: 12px; color: var(--text-secondary); }
+        .subitem-amount { font-size: 16px; font-weight: 600; color: #d63031; display: flex; align-items: center; gap: 10px; }
         .edit-btn, .delete-btn {
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-left: 5px;
-            transition: all 0.2s;
-            font-weight: 500;
+            color: white; border: none; padding: 6px 14px; border-radius: 6px;
+            cursor: pointer; font-size: 13px; margin-left: 5px; transition: all 0.2s; font-weight: 500;
         }
-
-        .edit-btn {
-            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-        }
-
-        .edit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-        }
-
-        .delete-btn {
-            background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
-        }
-
-        .delete-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
-        }
-
+        .edit-btn { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); }
+        .edit-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4); }
+        .delete-btn { background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%); }
+        .delete-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4); }
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 10px;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px;
         }
-
-        .modal.show {
-            display: flex;
-        }
-
+        .modal.show { display: flex; }
         .modal-content {
-            background: var(--modal-bg);
-            padding: 25px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
+            background: var(--modal-bg); padding: 25px; border-radius: 15px; width: 100%;
+            max-width: 400px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color);
         }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
+        .modal-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: var(--text-primary); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 14px; }
         .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            font-size: 16px;
-            background: var(--input-bg);
-            color: var(--text-primary);
+            width: 100%; padding: 10px; border: 2px solid var(--input-border); border-radius: 8px;
+            font-size: 16px; background: var(--input-bg); color: var(--text-primary);
         }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-buttons button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .btn-primary {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-secondary);
-        }
-
-        .btn-secondary {
-            background: var(--hover-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--input-bg);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: var(--accent-primary);
-            font-size: 18px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
+        .form-group input:focus { outline: none; border-color: var(--accent-primary); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-primary { background: var(--accent-primary); color: white; }
+        .btn-primary:hover { background: var(--accent-secondary); }
+        .btn-secondary { background: var(--hover-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--input-bg); }
+        .hidden { display: none !important; }
         .share-info {
-            background: var(--card-bg);
-            border: 2px solid var(--accent-primary);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--text-primary);
+            background: var(--card-bg); border: 2px solid var(--accent-primary); border-radius: 10px;
+            padding: 15px; margin-bottom: 20px; font-size: 14px; color: var(--text-primary);
         }
-
-        .share-info strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 15px;
-        }
-
-        .confirm-text {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
+        .share-info strong { display: block; margin-bottom: 5px; font-size: 15px; }
+        .confirm-text { color: var(--text-secondary); margin-bottom: 15px; line-height: 1.5; }
         @media (max-width: 1200px) {
-            .income-container {
-                grid-template-columns: 1fr;
-            }
-
-            .income-chart-container {
-                order: -1;
-            }
+            .income-container { grid-template-columns: 1fr; }
+            .income-chart-container { order: -1; }
         }
-
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 15px;
-                border-radius: 15px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .month-display {
-                font-size: 18px;
-                min-width: 120px;
-            }
-
-            .piggy-bank .amount {
-                font-size: 24px;
-            }
-
-            .card-amount {
-                font-size: 20px;
-            }
-
-            .summary-cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .section-title {
-                font-size: 16px;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
-
-            .income-items-wrapper {
-                grid-template-columns: 1fr;
-            }
-
-            #incomeChart {
-                height: 250px;
-            }
+            body { padding: 10px; }
+            .container { padding: 15px; border-radius: 15px; }
+            .header h1 { font-size: 20px; }
+            .month-display { font-size: 18px; min-width: 120px; }
+            .piggy-bank .amount { font-size: 24px; }
+            .card-amount { font-size: 20px; }
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+            .section-title { font-size: 16px; }
+            .modal-content { padding: 20px; }
+            .income-items-wrapper { grid-template-columns: 1fr; }
+            #incomeChart { height: 250px; }
         }
-
         @media (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-
-            .container {
-                padding: 12px;
-            }
-
-            .card {
-                padding: 12px;
-            }
-
-            .card-amount {
-                font-size: 18px;
-            }
-
-            .card.action .card-label {
-                font-size: 12px;
-            }
+            body { padding: 5px; }
+            .container { padding: 12px; }
+            .card { padding: 12px; }
+            .card-amount { font-size: 18px; }
+            .card.action .card-label { font-size: 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div id="loginContainer" class="login-container">
         <h1>💰 Expense Tracker</h1>
         <p style="color: var(--text-secondary); margin-bottom: 30px;">Track your monthly expenses with your partner</p>
@@ -881,35 +263,18 @@
         </button>
     </div>
 
-    <!-- Main App -->
     <div id="appContainer" class="container hidden">
         <div class="header">
             <div class="user-info">
-                <div class="hamburger-icon" id="hamburgerIcon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <div class="hamburger-icon" id="hamburgerIcon"><span></span><span></span><span></span></div>
                 <img id="userAvatar" class="user-avatar" src="" alt="User">
                 <div class="user-menu" id="userMenu">
-                    <div class="menu-item">
-                        <span id="userName">User</span>
-                    </div>
-                    <div class="menu-item" id="themeToggle">
-                        🌙 Toggle Light Mode
-                    </div>
-                    <div class="menu-item" id="shareBtn">
-                        👥 Share Tracker
-                    </div>
-                    <div class="menu-item" id="switchToOwnBtn">
-                        📊 Use My Own Tracker
-                    </div>
-                    <div class="menu-item" id="switchToSharedBtn">
-                        🤝 Use Shared Tracker
-                    </div>
-                    <div class="menu-item logout" id="signOutBtn">
-                        🚪 Sign Out
-                    </div>
+                    <div class="menu-item"><span id="userName">User</span></div>
+                    <div class="menu-item" id="themeToggle">🌙 Toggle Light Mode</div>
+                    <div class="menu-item" id="shareBtn">👥 Share Tracker</div>
+                    <div class="menu-item" id="switchToOwnBtn">📊 Use My Own Tracker</div>
+                    <div class="menu-item" id="switchToSharedBtn">🤝 Use Shared Tracker</div>
+                    <div class="menu-item logout" id="signOutBtn">🚪 Sign Out</div>
                 </div>
             </div>
             <h1>Expense Tracker</h1>
@@ -932,21 +297,10 @@
         </div>
 
         <div class="summary-cards">
-            <div class="card income">
-                <div class="card-label">Total Income</div>
-                <div class="card-amount" id="totalIncome">$0</div>
-            </div>
-            <div class="card spent">
-                <div class="card-label">Spent</div>
-                <div class="card-amount" id="totalSpent">$0</div>
-            </div>
-            <div class="card saved">
-                <div class="card-label">Saved</div>
-                <div class="card-amount" id="totalSaved">$0</div>
-            </div>
-            <div class="card action" id="addSavingsBtn">
-                <div class="card-label">💰 Add Savings to Piggy Bank</div>
-            </div>
+            <div class="card income"><div class="card-label">Total Income</div><div class="card-amount" id="totalIncome">$0</div></div>
+            <div class="card spent"><div class="card-label">Spent</div><div class="card-amount" id="totalSpent">$0</div></div>
+            <div class="card saved"><div class="card-label">Saved</div><div class="card-amount" id="totalSaved">$0</div></div>
+            <div class="card action" id="addSavingsBtn"><div class="card-label">💰 Add Savings to Piggy Bank</div></div>
         </div>
 
         <div class="section">
@@ -955,9 +309,7 @@
                 <button class="add-btn" id="addIncomeBtn">+ Add Income</button>
             </div>
             <div class="income-container">
-                <div class="income-items-wrapper">
-                    <div class="income-list" id="incomeList"></div>
-                </div>
+                <div class="income-items-wrapper"><div class="income-list" id="incomeList"></div></div>
                 <div class="income-chart-container">
                     <div class="income-chart-title">Income vs Expenses</div>
                     <canvas id="incomeChart"></canvas>
@@ -976,7 +328,6 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal for Adding Savings -->
     <div class="modal" id="confirmSavingsModal">
         <div class="modal-content">
             <div class="modal-title">Add Savings to Piggy Bank?</div>
@@ -988,18 +339,11 @@
         </div>
     </div>
 
-    <!-- Income Modal -->
     <div class="modal" id="incomeModal">
         <div class="modal-content">
             <div class="modal-title" id="incomeModalTitle">Add Income</div>
-            <div class="form-group">
-                <label>Source Name</label>
-                <input type="text" id="incomeName" placeholder="e.g., Your Salary">
-            </div>
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="incomeAmount" placeholder="0.00" step="0.01">
-            </div>
+            <div class="form-group"><label>Source Name</label><input type="text" id="incomeName" placeholder="e.g., Your Salary"></div>
+            <div class="form-group"><label>Amount</label><input type="number" id="incomeAmount" placeholder="0.00" step="0.01"></div>
             <div class="modal-buttons">
                 <button class="btn-secondary" id="cancelIncomeBtn">Cancel</button>
                 <button class="btn-primary" id="saveIncomeBtn">Save</button>
@@ -1007,14 +351,10 @@
         </div>
     </div>
 
-    <!-- Expense Modal -->
     <div class="modal" id="expenseModal">
         <div class="modal-content">
             <div class="modal-title">Add Expense Category</div>
-            <div class="form-group">
-                <label>Category Name</label>
-                <input type="text" id="expenseName" placeholder="e.g., Groceries">
-            </div>
+            <div class="form-group"><label>Category Name</label><input type="text" id="expenseName" placeholder="e.g., Groceries"></div>
             <div class="modal-buttons">
                 <button class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
                 <button class="btn-primary" id="saveExpenseBtn">Add</button>
@@ -1022,18 +362,11 @@
         </div>
     </div>
 
-    <!-- Subitem Modal -->
     <div class="modal" id="subitemModal">
         <div class="modal-content">
             <div class="modal-title">Add Item</div>
-            <div class="form-group">
-                <label>Item Name</label>
-                <input type="text" id="subitemName" placeholder="e.g., Bread">
-            </div>
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="subitemAmount" placeholder="0.00" step="0.01">
-            </div>
+            <div class="form-group"><label>Item Name</label><input type="text" id="subitemName" placeholder="e.g., Bread"></div>
+            <div class="form-group"><label>Amount</label><input type="number" id="subitemAmount" placeholder="0.00" step="0.01"></div>
             <div class="modal-buttons">
                 <button class="btn-secondary" id="cancelSubitemBtn">Cancel</button>
                 <button class="btn-primary" id="saveSubitemBtn">Add</button>
@@ -1041,14 +374,10 @@
         </div>
     </div>
 
-    <!-- Piggy Bank Edit Modal -->
     <div class="modal" id="piggyBankModal">
         <div class="modal-content">
             <div class="modal-title">Edit Piggy Bank</div>
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="piggyBankAmount" placeholder="0.00" step="0.01">
-            </div>
+            <div class="form-group"><label>Amount</label><input type="number" id="piggyBankAmount" placeholder="0.00" step="0.01"></div>
             <div class="modal-buttons">
                 <button class="btn-secondary" id="cancelPiggyBtn">Cancel</button>
                 <button class="btn-primary" id="savePiggyBtn">Save</button>
@@ -1056,7 +385,6 @@
         </div>
     </div>
 
-    <!-- Share Modal -->
     <div class="modal" id="shareModal">
         <div class="modal-content">
             <div class="modal-title">Share Expense Tracker</div>
@@ -1091,25 +419,17 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
         let currentUser = null;
         let unsubscribe = null;
         let trackerId = null;
 
-        // Load theme preference
         const savedTheme = localStorage.getItem('theme') || 'dark';
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        }
+        if (savedTheme === 'light') document.body.classList.add('light-mode');
 
         async function signInWithGoogle() {
             const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error('Sign in error:', error);
-                alert('Failed to sign in. Please try again.');
-            }
+            try { await signInWithPopup(auth, provider); }
+            catch (error) { console.error('Sign in error:', error); alert('Failed to sign in. Please try again.'); }
         }
 
         async function signOutUser() {
@@ -1120,39 +440,26 @@
                 document.getElementById('appContainer').classList.add('hidden');
                 const menu = document.getElementById('userMenu');
                 if (menu) menu.classList.remove('show');
-            } catch (error) {
-                console.error('Sign out error:', error);
-            }
+            } catch (error) { console.error('Sign out error:', error); }
         }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                
                 const savedTrackerId = localStorage.getItem(`trackerId_${user.email}`);
                 trackerId = savedTrackerId || user.email;
-                
                 document.getElementById('loginContainer').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 document.getElementById('userAvatar').src = user.photoURL || '';
                 document.getElementById('userName').textContent = user.displayName || user.email;
                 document.getElementById('yourEmail').textContent = user.email;
-                
                 await loadUserData();
-                
                 const docRef = doc(db, 'trackers', trackerId);
                 unsubscribe = onSnapshot(docRef, (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        window.appData = data;
-                        if (window.updateDisplay) {
-                            window.updateDisplay();
-                        }
-                    }
+                    if (doc.exists()) { window.appData = doc.data(); if (window.updateDisplay) window.updateDisplay(); }
                 });
             } else {
-                currentUser = null;
-                trackerId = null;
+                currentUser = null; trackerId = null;
                 document.getElementById('loginContainer').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
             }
@@ -1161,175 +468,96 @@
         async function loadUserData() {
             const docRef = doc(db, 'trackers', trackerId);
             const docSnap = await getDoc(docRef);
-            
             if (docSnap.exists()) {
                 window.appData = docSnap.data();
-                
-                // Initialize default expense categories if they don't exist
                 if (!window.appData.defaultExpensesInitialized) {
                     window.appData.defaultExpensesInitialized = true;
                     await window.saveData();
                 }
             } else {
-                window.appData = {
-                    incomes: [],
-                    months: {},
-                    piggyBank: 0,
-                    sharedWith: [],
-                    defaultExpensesInitialized: false
-                };
+                window.appData = { incomes: [], months: {}, piggyBank: 0, sharedWith: [], defaultExpensesInitialized: false };
                 await window.saveData();
             }
-            if (window.updateDisplay) {
-                window.updateDisplay();
-            }
+            if (window.updateDisplay) window.updateDisplay();
         }
 
         window.saveData = async function() {
             if (!trackerId) return;
-            try {
-                const docRef = doc(db, 'trackers', trackerId);
-                await setDoc(docRef, window.appData);
-            } catch (error) {
-                console.error('Error saving data:', error);
-                alert('Failed to save data. Please try again.');
-            }
+            try { const docRef = doc(db, 'trackers', trackerId); await setDoc(docRef, window.appData); }
+            catch (error) { console.error('Error saving data:', error); alert('Failed to save data. Please try again.'); }
         };
 
         window.shareTracker = async function() {
             const partnerEmail = document.getElementById('partnerEmail').value.trim();
-            if (!partnerEmail) {
-                alert('Please enter your partner\'s email');
-                return;
-            }
-
-            if (partnerEmail === currentUser.email) {
-                alert('You cannot share with yourself!');
-                return;
-            }
-
+            if (!partnerEmail) { alert('Please enter your partner\'s email'); return; }
+            if (partnerEmail === currentUser.email) { alert('You cannot share with yourself!'); return; }
             try {
                 const partnerDocRef = doc(db, 'trackers', partnerEmail);
                 const partnerDoc = await getDoc(partnerDocRef);
-
                 if (partnerDoc.exists()) {
                     const partnerData = partnerDoc.data();
-                    if (!partnerData.sharedWith) {
-                        partnerData.sharedWith = [];
-                    }
-                    
+                    if (!partnerData.sharedWith) partnerData.sharedWith = [];
                     if (!partnerData.sharedWith.includes(currentUser.email)) {
                         partnerData.sharedWith.push(currentUser.email);
                         await setDoc(partnerDocRef, partnerData);
                     }
-
                     localStorage.setItem(`trackerId_${currentUser.email}`, partnerEmail);
                     localStorage.setItem(`sharedTrackerId_${currentUser.email}`, partnerEmail);
-
                     trackerId = partnerEmail;
                     if (unsubscribe) unsubscribe();
                     await loadUserData();
-                    
                     const docRef = doc(db, 'trackers', trackerId);
                     unsubscribe = onSnapshot(docRef, (doc) => {
-                        if (doc.exists()) {
-                            window.appData = doc.data();
-                            if (window.updateDisplay) {
-                                window.updateDisplay();
-                            }
-                        }
+                        if (doc.exists()) { window.appData = doc.data(); if (window.updateDisplay) window.updateDisplay(); }
                     });
-                    
                     document.getElementById('shareModal').classList.remove('show');
                     alert('Connected! You are now sharing this tracker. Refresh to see updates.');
-                    
                     setTimeout(() => location.reload(), 1000);
-                } else {
-                    alert('Partner not found. Make sure they sign in first and share their email with you.');
-                }
-            } catch (error) {
-                console.error('Error sharing:', error);
-                alert('Failed to connect. Please check the email and try again.');
-            }
+                } else { alert('Partner not found. Make sure they sign in first and share their email with you.'); }
+            } catch (error) { console.error('Error sharing:', error); alert('Failed to connect. Please check the email and try again.'); }
         };
 
-        // Theme toggle
         document.getElementById('themeToggle').addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             document.getElementById('themeToggle').textContent = isLight ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
             document.getElementById('userMenu').classList.remove('show');
-            
-            // Update chart if it exists
-            if (window.updateDisplay) {
-                window.updateDisplay();
-            }
+            if (window.updateDisplay) window.updateDisplay();
         });
 
-        // Update theme toggle text on load
-        document.getElementById('themeToggle').textContent = 
+        document.getElementById('themeToggle').textContent =
             document.body.classList.contains('light-mode') ? '🌙 Toggle Dark Mode' : '☀️ Toggle Light Mode';
 
         document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
         document.getElementById('signOutBtn').addEventListener('click', signOutUser);
-        
-        document.getElementById('userAvatar').addEventListener('click', () => {
-            document.getElementById('userMenu').classList.toggle('show');
-        });
-
-        document.getElementById('hamburgerIcon').addEventListener('click', () => {
-            document.getElementById('userMenu').classList.toggle('show');
-        });
-
+        document.getElementById('userAvatar').addEventListener('click', () => { document.getElementById('userMenu').classList.toggle('show'); });
+        document.getElementById('hamburgerIcon').addEventListener('click', () => { document.getElementById('userMenu').classList.toggle('show'); });
         document.getElementById('shareBtn').addEventListener('click', () => {
             document.getElementById('userMenu').classList.remove('show');
             document.getElementById('shareModal').classList.add('show');
         });
-
         document.getElementById('switchToOwnBtn').addEventListener('click', () => {
-            if (currentUser) {
-                localStorage.setItem(`trackerId_${currentUser.email}`, currentUser.email);
-                document.getElementById('userMenu').classList.remove('show');
-                location.reload();
-            }
+            if (currentUser) { localStorage.setItem(`trackerId_${currentUser.email}`, currentUser.email); document.getElementById('userMenu').classList.remove('show'); location.reload(); }
         });
-
         document.getElementById('switchToSharedBtn').addEventListener('click', () => {
             if (currentUser) {
                 const sharedTrackerId = localStorage.getItem(`sharedTrackerId_${currentUser.email}`);
                 const currentTrackerId = localStorage.getItem(`trackerId_${currentUser.email}`);
-                
                 if (sharedTrackerId && sharedTrackerId !== currentUser.email) {
-                    if (currentTrackerId === sharedTrackerId) {
-                        alert('You are already viewing the shared tracker!');
-                    } else {
-                        localStorage.setItem(`trackerId_${currentUser.email}`, sharedTrackerId);
-                        document.getElementById('userMenu').classList.remove('show');
-                        location.reload();
-                    }
-                } else {
-                    alert('You don\'t have a shared tracker yet. Use "Share Tracker" to connect with a partner.');
-                }
+                    if (currentTrackerId === sharedTrackerId) { alert('You are already viewing the shared tracker!'); }
+                    else { localStorage.setItem(`trackerId_${currentUser.email}`, sharedTrackerId); document.getElementById('userMenu').classList.remove('show'); location.reload(); }
+                } else { alert('You don\'t have a shared tracker yet. Use "Share Tracker" to connect with a partner.'); }
                 document.getElementById('userMenu').classList.remove('show');
             }
         });
-
-        document.getElementById('cancelShareBtn').addEventListener('click', () => {
-            document.getElementById('shareModal').classList.remove('show');
-        });
-
-        document.getElementById('saveShareBtn').addEventListener('click', () => {
-            window.shareTracker();
-        });
-
+        document.getElementById('cancelShareBtn').addEventListener('click', () => { document.getElementById('shareModal').classList.remove('show'); });
+        document.getElementById('saveShareBtn').addEventListener('click', () => { window.shareTracker(); });
         document.addEventListener('click', (e) => {
             const userMenu = document.getElementById('userMenu');
             const userAvatar = document.getElementById('userAvatar');
             const hamburgerIcon = document.getElementById('hamburgerIcon');
-            if (userMenu && !userMenu.contains(e.target) && e.target !== userAvatar && !hamburgerIcon.contains(e.target)) {
-                userMenu.classList.remove('show');
-            }
+            if (userMenu && !userMenu.contains(e.target) && e.target !== userAvatar && !hamburgerIcon.contains(e.target)) userMenu.classList.remove('show');
         });
     </script>
 
@@ -1338,68 +566,44 @@
         let currentExpenseId = null;
         let editingIncomeIdx = null;
         let incomeChart = null;
-        
-        // Default expense categories
         const DEFAULT_EXPENSES = ['Bills', 'Groceries', 'Food/Drinks', 'Shopping'];
-        
-        window.appData = {
-            incomes: [],
-            months: {},
-            piggyBank: 0,
-            sharedWith: [],
-            defaultExpensesInitialized: false
-        };
 
-        function getMonthKey() {
-            return `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        window.appData = { incomes: [], months: {}, piggyBank: 0, sharedWith: [], defaultExpensesInitialized: false };
+
+        function getMonthKey() { return `${currentDate.getFullYear()}-${currentDate.getMonth()}`; }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
         }
 
         function initMonth() {
             const key = getMonthKey();
             if (!window.appData.months[key]) {
-                window.appData.months[key] = {
-                    expenses: [],
-                    addedToPiggyBank: false
-                };
-                
-                // Add default expense categories for new months
+                window.appData.months[key] = { expenses: [], addedToPiggyBank: false };
                 DEFAULT_EXPENSES.forEach(category => {
-                    window.appData.months[key].expenses.push({ 
-                        name: category, 
-                        subitems: [],
-                        isDefault: true 
-                    });
+                    window.appData.months[key].expenses.push({ name: category, subitems: [], isDefault: true });
                 });
-                
                 window.saveData();
             } else {
-                // Ensure default categories exist for existing months
                 DEFAULT_EXPENSES.forEach(category => {
                     const exists = window.appData.months[key].expenses.some(exp => exp.name === category);
-                    if (!exists) {
-                        window.appData.months[key].expenses.unshift({ 
-                            name: category, 
-                            subitems: [],
-                            isDefault: true 
-                        });
-                    }
+                    if (!exists) window.appData.months[key].expenses.unshift({ name: category, subitems: [], isDefault: true });
                 });
             }
         }
 
         window.updateDisplay = function() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                          'July', 'August', 'September', 'October', 'November', 'December'];
-            document.getElementById('monthDisplay').textContent = 
-                `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            
+            const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            document.getElementById('monthDisplay').textContent = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
             initMonth();
             const monthData = window.appData.months[getMonthKey()];
-            
+
             const totalIncome = window.appData.incomes.reduce((sum, inc) => sum + inc.amount, 0);
-            const totalSpent = monthData.expenses.reduce((sum, exp) => {
-                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
-            }, 0);
+            const totalSpent = monthData.expenses.reduce((sum, exp) => sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0), 0);
             const saved = totalIncome - totalSpent;
 
             document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)}`;
@@ -1411,9 +615,7 @@
             incomeList.innerHTML = window.appData.incomes.map((inc, idx) => `
                 <div class="income-item" data-income-id="${idx}">
                     <div class="income-item-header">
-                        <div class="income-item-content">
-                            <strong>${inc.name}</strong>
-                        </div>
+                        <div class="income-item-content"><strong>${inc.name}</strong></div>
                         <div class="income-amount-section">
                             <span class="income-amount">${inc.amount.toFixed(2)}</span>
                             <span class="income-toggle-icon">▼</span>
@@ -1427,28 +629,17 @@
             `).join('');
 
             document.querySelectorAll('.income-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    if (!e.target.closest('button')) {
-                        this.classList.toggle('expanded');
-                    }
-                });
+                item.addEventListener('click', function(e) { if (!e.target.closest('button')) this.classList.toggle('expanded'); });
             });
-
             document.querySelectorAll('[data-edit-income]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    editIncome(parseInt(this.getAttribute('data-edit-income')));
-                });
+                btn.addEventListener('click', function(e) { e.stopPropagation(); editIncome(parseInt(this.getAttribute('data-edit-income'))); });
             });
-
             document.querySelectorAll('[data-delete-income]').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const idx = parseInt(this.getAttribute('data-delete-income'));
                     if (confirm('Are you sure you want to delete this income source?')) {
-                        window.appData.incomes.splice(idx, 1);
-                        window.saveData();
-                        window.updateDisplay();
+                        window.appData.incomes.splice(idx, 1); window.saveData(); window.updateDisplay();
                     }
                 });
             });
@@ -1460,6 +651,15 @@
                 const total = exp.subitems.reduce((s, sub) => s + sub.amount, 0);
                 const percentage = totalIncome > 0 ? (total / totalIncome) * 100 : 0;
                 const itemCount = exp.subitems.length;
+
+                // Sort subitems by date, most recent first
+                const sortedSubitems = [...exp.subitems].map((sub, origIdx) => ({...sub, origIdx}));
+                sortedSubitems.sort((a, b) => {
+                    const dateA = a.date ? new Date(a.date).getTime() : 0;
+                    const dateB = b.date ? new Date(b.date).getTime() : 0;
+                    return dateB - dateA;
+                });
+
                 return `
                     <div class="expense-item" data-expense-id="${idx}">
                         <div class="expense-header" data-toggle-expense="${idx}">
@@ -1478,12 +678,15 @@
                             ${!exp.isDefault ? `<button class="delete-btn" data-delete-expense="${idx}">Delete Category</button>` : ''}
                         </div>
                         <div class="expense-subitems" id="expense-${idx}">
-                            ${exp.subitems.map((sub, subIdx) => `
+                            ${sortedSubitems.map(sub => `
                                 <div class="subitem">
-                                    <span class="subitem-name">${sub.name}</span>
+                                    <div class="subitem-left">
+                                        <span class="subitem-name">${sub.name}</span>
+                                        <span class="subitem-date">${formatDate(sub.date)}</span>
+                                    </div>
                                     <span class="subitem-amount">
                                         ${sub.amount.toFixed(2)}
-                                        <button class="delete-btn" data-delete-subitem="${idx}-${subIdx}">Delete</button>
+                                        <button class="delete-btn" data-delete-subitem="${idx}-${sub.origIdx}">Delete</button>
                                     </span>
                                 </div>
                             `).join('')}
@@ -1501,21 +704,12 @@
                     subitems.classList.toggle('show');
                 });
             });
-
             document.querySelectorAll('[data-delete-expense]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    deleteExpense(parseInt(this.getAttribute('data-delete-expense')));
-                });
+                btn.addEventListener('click', function(e) { e.stopPropagation(); deleteExpense(parseInt(this.getAttribute('data-delete-expense'))); });
             });
-
             document.querySelectorAll('[data-add-subitem]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    openSubitemModal(parseInt(this.getAttribute('data-add-subitem')));
-                });
+                btn.addEventListener('click', function(e) { e.stopPropagation(); openSubitemModal(parseInt(this.getAttribute('data-add-subitem'))); });
             });
-
             document.querySelectorAll('[data-delete-subitem]').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const [expIdx, subIdx] = this.getAttribute('data-delete-subitem').split('-').map(Number);
@@ -1527,93 +721,45 @@
         function updateIncomeChart(totalIncome, totalSpent) {
             const ctx = document.getElementById('incomeChart');
             if (!ctx) return;
-
             const remaining = Math.max(0, totalIncome - totalSpent);
-
-            if (incomeChart) {
-                incomeChart.destroy();
-            }
-
+            if (incomeChart) incomeChart.destroy();
             const isDark = !document.body.classList.contains('light-mode');
-
             incomeChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Spent', 'Remaining'],
-                    datasets: [{
-                        data: [totalSpent, remaining],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.8)',
-                            'rgba(75, 192, 192, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(75, 192, 192, 1)'
-                        ],
-                        borderWidth: 2
-                    }]
+                    datasets: [{ data: [totalSpent, remaining],
+                        backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'], borderWidth: 2 }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
+                    responsive: true, maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                },
-                                color: isDark ? '#e4e6eb' : '#2d3436'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed || 0;
-                                    const percentage = totalIncome > 0 ? ((value / totalIncome) * 100).toFixed(1) : 0;
-                                    return `${label}: ${value.toFixed(2)} (${percentage}%)`;
-                                }
-                            }
-                        }
+                        legend: { position: 'bottom', labels: { padding: 15, font: { size: 12 }, color: isDark ? '#e4e6eb' : '#2d3436' } },
+                        tooltip: { callbacks: { label: function(context) {
+                            const label = context.label || ''; const value = context.parsed || 0;
+                            const percentage = totalIncome > 0 ? ((value / totalIncome) * 100).toFixed(1) : 0;
+                            return `${label}: ${value.toFixed(2)} (${percentage}%)`;
+                        }}}
                     }
                 }
             });
         }
 
-        function showConfirmSavingsModal() {
-            document.getElementById('confirmSavingsModal').classList.add('show');
-        }
-
-        function closeConfirmSavingsModal() {
-            document.getElementById('confirmSavingsModal').classList.remove('show');
-        }
+        function showConfirmSavingsModal() { document.getElementById('confirmSavingsModal').classList.add('show'); }
+        function closeConfirmSavingsModal() { document.getElementById('confirmSavingsModal').classList.remove('show'); }
 
         function addToPiggyBank() {
             const monthData = window.appData.months[getMonthKey()];
-            
-            if (monthData.addedToPiggyBank) {
-                alert('This month\'s savings have already been added to the Piggy Bank!');
-                return;
-            }
-
+            if (monthData.addedToPiggyBank) { alert('This month\'s savings have already been added to the Piggy Bank!'); return; }
             const totalIncome = window.appData.incomes.reduce((sum, inc) => sum + inc.amount, 0);
-            const totalSpent = monthData.expenses.reduce((sum, exp) => {
-                return sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0);
-            }, 0);
+            const totalSpent = monthData.expenses.reduce((sum, exp) => sum + exp.subitems.reduce((s, sub) => s + sub.amount, 0), 0);
             const saved = totalIncome - totalSpent;
-
             if (saved > 0) {
-                window.appData.piggyBank += saved;
-                monthData.addedToPiggyBank = true;
-                window.saveData();
-                window.updateDisplay();
+                window.appData.piggyBank += saved; monthData.addedToPiggyBank = true;
+                window.saveData(); window.updateDisplay();
                 alert(`${saved.toFixed(2)} added to Piggy Bank!`);
-            } else {
-                alert('No savings to add this month.');
-            }
-            
+            } else { alert('No savings to add this month.'); }
             closeConfirmSavingsModal();
         }
 
@@ -1621,130 +767,81 @@
             document.getElementById('piggyBankAmount').value = window.appData.piggyBank;
             document.getElementById('piggyBankModal').classList.add('show');
         }
-
-        function closePiggyBankModal() {
-            document.getElementById('piggyBankModal').classList.remove('show');
-        }
-
+        function closePiggyBankModal() { document.getElementById('piggyBankModal').classList.remove('show'); }
         function savePiggyBank() {
             const amount = parseFloat(document.getElementById('piggyBankAmount').value);
-            
-            if (!isNaN(amount) && amount >= 0) {
-                window.appData.piggyBank = amount;
-                closePiggyBankModal();
-                window.saveData();
-                window.updateDisplay();
-            }
+            if (!isNaN(amount) && amount >= 0) { window.appData.piggyBank = amount; closePiggyBankModal(); window.saveData(); window.updateDisplay(); }
         }
 
-        function prevMonth() {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            window.updateDisplay();
-        }
-
-        function nextMonth() {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            window.updateDisplay();
-        }
+        function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); window.updateDisplay(); }
+        function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); window.updateDisplay(); }
 
         function openIncomeModal() {
             editingIncomeIdx = null;
             document.getElementById('incomeModalTitle').textContent = 'Add Income';
             document.getElementById('incomeModal').classList.add('show');
-            document.getElementById('incomeName').value = '';
-            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeName').value = ''; document.getElementById('incomeAmount').value = '';
         }
-
-        function closeIncomeModal() {
-            document.getElementById('incomeModal').classList.remove('show');
-            editingIncomeIdx = null;
-        }
-
+        function closeIncomeModal() { document.getElementById('incomeModal').classList.remove('show'); editingIncomeIdx = null; }
         function editIncome(idx) {
-            editingIncomeIdx = idx;
-            const income = window.appData.incomes[idx];
+            editingIncomeIdx = idx; const income = window.appData.incomes[idx];
             document.getElementById('incomeModalTitle').textContent = 'Edit Income';
             document.getElementById('incomeName').value = income.name;
             document.getElementById('incomeAmount').value = income.amount;
             document.getElementById('incomeModal').classList.add('show');
         }
-
         function saveIncome() {
             const name = document.getElementById('incomeName').value;
             const amount = parseFloat(document.getElementById('incomeAmount').value);
-            
             if (name && amount > 0) {
-                if (editingIncomeIdx !== null) {
-                    window.appData.incomes[editingIncomeIdx] = { name, amount };
-                } else {
-                    window.appData.incomes.push({ name, amount });
-                }
-                closeIncomeModal();
-                window.saveData();
-                window.updateDisplay();
+                if (editingIncomeIdx !== null) window.appData.incomes[editingIncomeIdx] = { name, amount };
+                else window.appData.incomes.push({ name, amount });
+                closeIncomeModal(); window.saveData(); window.updateDisplay();
             }
         }
 
-        function openExpenseModal() {
-            document.getElementById('expenseModal').classList.add('show');
-            document.getElementById('expenseName').value = '';
-        }
-
-        function closeExpenseModal() {
-            document.getElementById('expenseModal').classList.remove('show');
-        }
-
+        function openExpenseModal() { document.getElementById('expenseModal').classList.add('show'); document.getElementById('expenseName').value = ''; }
+        function closeExpenseModal() { document.getElementById('expenseModal').classList.remove('show'); }
         function addExpense() {
             const name = document.getElementById('expenseName').value;
-            
             if (name) {
                 const monthData = window.appData.months[getMonthKey()];
                 monthData.expenses.push({ name, subitems: [], isDefault: false });
-                closeExpenseModal();
-                window.saveData();
-                window.updateDisplay();
+                closeExpenseModal(); window.saveData(); window.updateDisplay();
             }
         }
-
         function deleteExpense(idx) {
             if (confirm('Are you sure you want to delete this expense category?')) {
                 const monthData = window.appData.months[getMonthKey()];
-                monthData.expenses.splice(idx, 1);
-                window.saveData();
-                window.updateDisplay();
+                monthData.expenses.splice(idx, 1); window.saveData(); window.updateDisplay();
             }
         }
 
         function openSubitemModal(expenseIdx) {
             currentExpenseId = expenseIdx;
             document.getElementById('subitemModal').classList.add('show');
-            document.getElementById('subitemName').value = '';
-            document.getElementById('subitemAmount').value = '';
+            document.getElementById('subitemName').value = ''; document.getElementById('subitemAmount').value = '';
         }
-
-        function closeSubitemModal() {
-            document.getElementById('subitemModal').classList.remove('show');
-            currentExpenseId = null;
-        }
+        function closeSubitemModal() { document.getElementById('subitemModal').classList.remove('show'); currentExpenseId = null; }
 
         function addSubitem() {
             const name = document.getElementById('subitemName').value;
             const amount = parseFloat(document.getElementById('subitemAmount').value);
-            
             if (name && amount > 0 && currentExpenseId !== null) {
                 const monthData = window.appData.months[getMonthKey()];
-                monthData.expenses[currentExpenseId].subitems.push({ name, amount });
-                closeSubitemModal();
-                window.saveData();
-                window.updateDisplay();
+                monthData.expenses[currentExpenseId].subitems.push({
+                    name,
+                    amount,
+                    date: new Date().toISOString()
+                });
+                closeSubitemModal(); window.saveData(); window.updateDisplay();
             }
         }
 
         function deleteSubitem(expenseIdx, subitemIdx) {
             const monthData = window.appData.months[getMonthKey()];
             monthData.expenses[expenseIdx].subitems.splice(subitemIdx, 1);
-            window.saveData();
-            window.updateDisplay();
+            window.saveData(); window.updateDisplay();
         }
 
         document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
@@ -1766,4 +863,3 @@
     </script>
 </body>
 </html>
-
