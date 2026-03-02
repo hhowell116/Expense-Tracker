@@ -228,14 +228,16 @@
         .checklist-wrapper.open .checklist-arrow { transform: rotate(180deg); }
         .checklist-body {
             max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+            padding-top: 0;
         }
+        .checklist-wrapper.open .checklist-body { padding-top: 8px; }
         .checklist-wrapper.open .checklist-body { max-height: 800px; }
         .checklist-items {
             padding: 0 16px 12px 16px;
             display: flex; flex-direction: column; gap: 6px;
         }
         .checklist-add-row {
-            display: flex; gap: 8px; padding: 0 16px 12px 16px;
+            display: flex; gap: 8px; padding: 4px 16px 12px 16px;
         }
         .checklist-add-input {
             flex: 1; padding: 7px 10px; border: 1px solid var(--input-border);
@@ -895,7 +897,7 @@
                         <div class="expense-bar" style="width: ${Math.min(percentage, 100)}%"></div>
                         <div class="expense-actions">
                             <button class="add-btn" data-add-subitem="${idx}">+ Add Item</button>
-                            ${!exp.isDefault ? `<button class="delete-btn" data-delete-expense="${idx}">Delete Category</button>` : ''}
+                            <button class="delete-btn" data-delete-expense="${idx}">Delete Category</button>
                         </div>
                         <div class="expense-subitems" id="expense-${idx}">
                             ${sortedSubitems.map(sub => `
